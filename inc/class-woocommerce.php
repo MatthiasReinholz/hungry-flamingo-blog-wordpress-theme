@@ -63,7 +63,8 @@ final class WooCommerce {
 			|| ( function_exists( 'is_cart' ) && is_cart() )
 			|| ( function_exists( 'is_checkout' ) && is_checkout() )
 			|| ( function_exists( 'is_account_page' ) && is_account_page() )
-			|| $this->is_product_search();
+			|| $this->is_product_search()
+			|| $this->has_woocommerce_blocks();
 	}
 
 	private function is_product_search(): bool {
@@ -77,6 +78,25 @@ final class WooCommerce {
 		}
 
 		return 'product' === $post_type;
+	}
+
+	private function has_woocommerce_blocks(): bool {
+		if ( ! is_singular() ) {
+			return false;
+		}
+
+		$post = get_post();
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		return has_block( 'woocommerce/product-collection', $post )
+			|| has_block( 'woocommerce/product-template', $post )
+			|| has_block( 'woocommerce/cart', $post )
+			|| has_block( 'woocommerce/checkout', $post )
+			|| has_block( 'woocommerce/mini-cart', $post )
+			|| has_block( 'woocommerce/featured-product', $post )
+			|| has_block( 'woocommerce/handpicked-products', $post );
 	}
 
 	private function asset_version( string $path ): string {

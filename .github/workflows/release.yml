@@ -20,6 +20,7 @@ jobs:
       contents: write
       attestations: write
       id-token: write
+    environment: production
 
     steps:
       - name: Validate target version
@@ -47,6 +48,17 @@ jobs:
         with:
           ref: refs/tags/${{ steps.version.outputs.value }}
           fetch-depth: 0
+
+      - name: Verify release tag is annotated
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          git fetch --tags origin
+          if [ "$(git cat-file -t "refs/tags/$VERSION")" != "tag" ]; then
+            echo "Tag $VERSION exists but is not an annotated tag." >&2
+            exit 1
+          fi
 
       - name: Set up PHP
         uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f
@@ -78,7 +90,7 @@ jobs:
       - name: Build and verify release package
         run: |
           npm run dist
-          npm run verify:dist
+          HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 
       - name: Generate release notes
         run: bash scripts/generate-release-notes.sh "${{ steps.version.outputs.value }}" > dist/release-notes.md
@@ -103,10 +115,25 @@ jobs:
           set -euo pipefail
           if gh release view "$VERSION" >/dev/null 2>&1; then
             gh release upload "$VERSION" dist/hungry-flamingo-blog.zip --clobber
-            gh release edit "$VERSION" --title "$VERSION" --notes-file dist/release-notes.md
+            gh release edit "$VERSION" --title "$VERSION" --notes-file dist/release-notes.md --prerelease=false --latest
           else
             gh release create "$VERSION" dist/hungry-flamingo-blog.zip \
               --verify-tag \
               --title "$VERSION" \
+              --latest \
               --notes-file dist/release-notes.md
           fi
+
+      - name: Verify GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          gh release view "$VERSION" \
+            --json isDraft,isPrerelease,assets \
+            --jq '
+              if .isDraft then error("release is still a draft") else . end
+              | if .isPrerelease then error("stable release was marked prerelease") else . end
+              | if ([.assets[] | select(.name == "hungry-flamingo-blog.zip" and .size > 0)] | length) != 1 then error("missing installable ZIP asset") else "verified" end
+            '

@@ -14,6 +14,8 @@ Hungry Flamingo Blog is a colorful block theme for editorial blogs and longform 
 - Patterns: article card, home hero, and sidebar category widget.
 - Client-side enhancements for search overlay, table of contents, sidebar author card, mobile menu, feed links, and color scheme persistence.
 - WooCommerce support declarations, product gallery support, theme.json block styles, and conditional store styles for WooCommerce catalog, product, cart, checkout, order-confirmation, and account surfaces.
+- WooCommerce presentation patterns for product collections, article-product callouts, comparison tables, cart trust bands, and post-purchase reading.
+- Style variations for alternative first-party color systems.
 - Translation seed file at `languages/hungry-flamingo-blog.pot`.
 - Continuous reading is available through the separate Hungry Flamingo Blog Companion plugin.
 - Repository-specific AI coding-agent instructions are documented in `AGENTS.md`.
@@ -29,6 +31,12 @@ The continuous-reading feature lives in the separate Hungry Flamingo Blog Compan
 Newsletter forms were intentionally replaced with RSS links. Add newsletter capture through a plugin or service integration, not directly in the theme.
 
 WooCommerce compatibility is intentionally theme-only. Commerce data, payments, product management, and checkout behavior remain owned by WooCommerce.
+
+The theme includes WooCommerce presentation patterns. Insert them only on sites where WooCommerce is active; they are layout starters, not commerce logic.
+
+## Editor And Fonts
+
+See [docs/editorial-workflow.md](docs/editorial-workflow.md) for template/pattern guidance and [docs/font-policy.md](docs/font-policy.md) for the local-font policy. Site-specific font uploads should use WordPress core's Font Library, not a companion-plugin uploader.
 
 ## Development
 
@@ -62,8 +70,11 @@ Use the GitHub Actions release flow for production artifacts:
 - `Prepare release` creates or updates a `release/x.y.z` pull request and bumps theme metadata.
 - `Finalize release` publishes the release after a merged `release/*` or `hotfix/*` PR to `main`.
 - `Release repair` rebuilds and republishes the artifact for an existing tag.
+- `Publish tag release` is a safety net for pushed prerelease semver tags such as `v1.0.0-beta.1`. It creates or repairs the GitHub prerelease and uploads the verified installable ZIP so a prerelease tag does not remain tag-only. Stable `x.y.z` tags are published by the release PR/finalize flow, not by tag push.
 
-All three flows build the clean package through `scripts/build-theme-zip.sh` and verify it through `scripts/verify-release-package.sh`.
+All release publication flows build the clean package through `scripts/build-theme-zip.sh` and verify it through `scripts/verify-release-package.sh`.
+
+Prerelease tags package the matching stable WordPress metadata version. For example, `v1.0.0-beta.1` installs as theme version `1.0.0` while GitHub marks the artifact as a prerelease for tester distribution.
 
 ## Privacy
 

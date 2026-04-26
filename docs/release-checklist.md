@@ -17,4 +17,7 @@
 - Confirm the release ZIP excludes development-only files such as `AGENTS.md`, CI config, tests, Composer files, npm files, and local tooling.
 - Confirm keyboard access, skip link, search dialog focus handling, mobile menu focus handling, and visible focus states.
 - Confirm WooCommerce product cards, add-to-cart controls, notices, cart quantity controls, checkout fields, mobile cart submit container, and order confirmation blocks pass keyboard and accessibility smoke checks.
-- Release through the `Prepare release`, `Finalize release`, or `Release repair` GitHub Actions workflows so GitHub Release assets are produced from the verified package.
+- Release stable versions through the `Prepare release` and `Finalize release` GitHub Actions workflows so GitHub Release assets are produced from the verified package.
+- For beta releases, push a prerelease semver tag such as `v1.0.0-beta.1`; the `Publish tag release` workflow must finish green and attach the verified installable ZIP to the GitHub prerelease.
+- Confirm testers understand that prerelease tags use the matching stable WordPress metadata version inside the installable package.
+- Use `Release repair` only to intentionally rebuild and republish the artifact for an existing stable tag.

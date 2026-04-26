@@ -27,9 +27,10 @@ if [ ! -f "$PACKAGE_DIR/style.css" ] || [ ! -f "$PACKAGE_DIR/theme.json" ] || [ 
 fi
 
 rm -f "$DIST_DIR/$SLUG.zip"
+find "$PACKAGE_DIR" -exec touch -h -t 200001010000.00 {} +
 (
 	cd "$PACKAGE_ROOT"
-	zip -qr "$DIST_DIR/$SLUG.zip" "$SLUG"
+	find "$SLUG" -print | LC_ALL=C sort | zip -X -q "$DIST_DIR/$SLUG.zip" -@
 )
 
 echo "Created $DIST_DIR/$SLUG.zip"

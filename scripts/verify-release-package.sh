@@ -17,16 +17,16 @@ required_files=(
 	"$PACKAGE_DIR/theme.json"
 	"$PACKAGE_DIR/readme.txt"
 	"$PACKAGE_DIR/screenshot.png"
-		"$PACKAGE_DIR/languages/hungry-flamingo-blog.pot"
-		"$PACKAGE_DIR/assets/css/woocommerce.css"
-		"$PACKAGE_DIR/templates/index.html"
-		"$PACKAGE_DIR/templates/archive-product.html"
-		"$PACKAGE_DIR/templates/single-product.html"
-		"$PACKAGE_DIR/templates/page-cart.html"
-		"$PACKAGE_DIR/templates/page-checkout.html"
-		"$PACKAGE_DIR/templates/order-confirmation.html"
-		"$PACKAGE_DIR/templates/product-search-results.html"
-	)
+	"$PACKAGE_DIR/languages/hungry-flamingo-blog.pot"
+	"$PACKAGE_DIR/assets/css/woocommerce.css"
+	"$PACKAGE_DIR/templates/index.html"
+	"$PACKAGE_DIR/templates/archive-product.html"
+	"$PACKAGE_DIR/templates/single-product.html"
+	"$PACKAGE_DIR/templates/page-cart.html"
+	"$PACKAGE_DIR/templates/page-checkout.html"
+	"$PACKAGE_DIR/templates/order-confirmation.html"
+	"$PACKAGE_DIR/templates/product-search-results.html"
+)
 
 for file in "${required_files[@]}"; do
 	if [ ! -f "$file" ]; then
@@ -47,6 +47,7 @@ allowed_top_level=(
 	"patterns"
 	"readme.txt"
 	"screenshot.png"
+	"styles"
 	"style.css"
 	"templates"
 	"theme.json"
@@ -76,15 +77,15 @@ required_zip_entries=(
 	"$SLUG/theme.json"
 	"$SLUG/readme.txt"
 	"$SLUG/screenshot.png"
-		"$SLUG/languages/hungry-flamingo-blog.pot"
-		"$SLUG/assets/css/woocommerce.css"
-		"$SLUG/templates/archive-product.html"
-		"$SLUG/templates/single-product.html"
-		"$SLUG/templates/page-cart.html"
-		"$SLUG/templates/page-checkout.html"
-		"$SLUG/templates/order-confirmation.html"
-		"$SLUG/templates/product-search-results.html"
-	)
+	"$SLUG/languages/hungry-flamingo-blog.pot"
+	"$SLUG/assets/css/woocommerce.css"
+	"$SLUG/templates/archive-product.html"
+	"$SLUG/templates/single-product.html"
+	"$SLUG/templates/page-cart.html"
+	"$SLUG/templates/page-checkout.html"
+	"$SLUG/templates/order-confirmation.html"
+	"$SLUG/templates/product-search-results.html"
+)
 
 for entry in "${required_zip_entries[@]}"; do
 	if ! grep -Fxq "$entry" "$zip_listing"; then

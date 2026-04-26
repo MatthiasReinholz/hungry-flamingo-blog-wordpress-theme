@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -104,7 +107,7 @@ jobs:
         run: |
           set -euo pipefail
           npm run dist
-          npm run verify:dist
+          HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 
       - name: Upload theme package artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
