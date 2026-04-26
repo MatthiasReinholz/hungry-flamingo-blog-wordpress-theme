@@ -1,0 +1,35 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","className":"site-main","align":"full","anchor":"site-content","layout":{"type":"constrained"}} -->
+<main id="site-content" class="wp-block-group alignfull site-main">
+
+	<!-- wp:group {"className":"archive-header archive-header--date","layout":{"type":"constrained"}} -->
+	<div class="wp-block-group archive-header archive-header--date">
+		<!-- wp:query-title {"type":"archive","level":1,"className":"archive-header__title"} /-->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"className":"section section--articles","layout":{"type":"constrained"}} -->
+	<div class="wp-block-group section section--articles">
+		<!-- wp:query {"queryId":9,"query":{"perPage":12,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":true},"className":"article-grid"} -->
+		<div class="wp-block-query article-grid">
+			<!-- wp:post-template {"className":"article-grid__list"} -->
+				<!-- wp:pattern {"slug":"hungry-flamingo-blog/article-card"} /-->
+			<!-- /wp:post-template -->
+			<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
+				<!-- wp:query-pagination-previous /-->
+				<!-- wp:query-pagination-numbers /-->
+				<!-- wp:query-pagination-next /-->
+			<!-- /wp:query-pagination -->
+			<!-- wp:query-no-results -->
+				<!-- wp:paragraph --><p>No articles found for this date.</p><!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+	</div>
+	<!-- /wp:group -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

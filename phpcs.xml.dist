@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<ruleset name="Hungry Flamingo Blog">
+	<description>Project PHP coding standards.</description>
+
+	<file>functions.php</file>
+	<file>inc</file>
+	<file>patterns</file>
+
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+
+	<config name="testVersion" value="8.2-"/>
+
+	<rule ref="WordPress-Core">
+		<!-- This theme intentionally supports modern PHP and follows short-array style. -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+
+		<!-- Keep the first gate focused on correctness/security; formatting can be tightened later. -->
+		<exclude name="Generic.Formatting.MultipleStatementAlignment"/>
+		<exclude name="Generic.Functions.FunctionCallArgumentSpacing"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature"/>
+		<exclude name="Squiz.PHP.EmbeddedPhp"/>
+		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames"/>
+		<exclude name="Universal.Operators.DisallowShortTernary"/>
+		<exclude name="WordPress.Arrays.ArrayDeclarationSpacing"/>
+		<exclude name="WordPress.Arrays.MultipleStatementAlignment"/>
+	</rule>
+	<rule ref="PHPCompatibilityWP"/>
+</ruleset>

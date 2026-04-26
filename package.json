@@ -1,0 +1,22 @@
+{
+	"name": "hungry-flamingo-blog-wordpress-theme",
+	"version": "1.0.0",
+	"private": true,
+	"description": "A colorful editorial block theme for longform WordPress blogs.",
+	"scripts": {
+		"dist": "bash scripts/build-theme-zip.sh",
+		"lint:js": "eslint assets/js tests/visual",
+		"lint:css": "stylelint \"assets/css/**/*.css\"",
+		"test:visual": "playwright test",
+		"verify:dist": "bash scripts/verify-release-package.sh",
+		"test": "npm run lint:js && npm run lint:css"
+	},
+	"devDependencies": {
+		"@axe-core/playwright": "^4.11.2",
+		"@eslint/js": "^9.24.0",
+		"@playwright/test": "^1.52.0",
+		"eslint": "^9.24.0",
+		"stylelint": "^16.18.0",
+		"stylelint-config-standard": "^38.0.0"
+	}
+}

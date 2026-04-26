@@ -1,0 +1,138 @@
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: How to derive the next release version
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - custom
+      version:
+        description: Release version in x.y.z format when release type is custom
+        required: false
+        type: string
+      base_ref:
+        description: Base branch for the release branch
+        required: true
+        default: main
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: prepare-release-${{ inputs.base_ref }}-${{ inputs.release_type }}-${{ inputs.version || 'auto' }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare release PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out base ref
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.base_ref }}
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: '22'
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.release_type }}" = "custom" ]; then
+            version="${{ inputs.version }}"
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Custom version must use x.y.z format." >&2
+              exit 1
+            fi
+          else
+            version="$(bash scripts/next-version.sh "${{ inputs.release_type }}")"
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check out release branch
+        env:
+          RELEASE_BRANCH: release/${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "$RELEASE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$RELEASE_BRANCH"
+            git checkout -B "$RELEASE_BRANCH" "origin/$RELEASE_BRANCH"
+          else
+            git checkout -B "$RELEASE_BRANCH"
+          fi
+
+      - name: Bump release metadata
+        run: bash scripts/bump-version.sh "${{ steps.version.outputs.value }}"
+
+      - name: Validate release package
+        run: |
+          npm ci
+          npm run dist
+          npm run verify:dist
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push release branch
+        env:
+          RELEASE_BRANCH: release/${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain)" ]; then
+            git add CHANGELOG.md package-lock.json package.json readme.txt style.css
+            git commit -m "Release ${{ steps.version.outputs.value }}"
+          fi
+          git push --set-upstream origin "$RELEASE_BRANCH"
+
+      - name: Write release pull request body
+        run: |
+          {
+            echo "This PR prepares Hungry Flamingo Blog ${{ steps.version.outputs.value }}."
+            echo
+            echo "Included automation:"
+            echo "- bump theme metadata in style.css and readme.txt"
+            echo "- bump npm package metadata"
+            echo "- add a changelog section for the release"
+            echo "- build and verify the clean installable theme artifact"
+            echo
+            echo "Before merge, review CHANGELOG.md and edit the release notes if needed."
+          } > "$RUNNER_TEMP/release-pr.md"
+
+      - name: Create or update release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_BRANCH: release/${{ steps.version.outputs.value }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          existing_pr="$(gh pr list --head "$RELEASE_BRANCH" --base "${{ inputs.base_ref }}" --state open --json url --jq '.[0].url')"
+          if [ -n "$existing_pr" ]; then
+            gh pr edit "$existing_pr" \
+              --title "Release $RELEASE_VERSION" \
+              --body-file "$RUNNER_TEMP/release-pr.md"
+            echo "Updated $existing_pr"
+          else
+            gh pr create \
+              --base "${{ inputs.base_ref }}" \
+              --head "$RELEASE_BRANCH" \
+              --title "Release $RELEASE_VERSION" \
+              --body-file "$RUNNER_TEMP/release-pr.md"
+          fi

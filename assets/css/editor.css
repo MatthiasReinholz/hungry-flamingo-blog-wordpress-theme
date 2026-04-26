@@ -1,0 +1,24 @@
+/*! Hungry Flamingo Blog — editor.css
+ * Minimal styles so the block editor previews roughly match the front end.
+ * (The theme.css tokens already surface via theme.json.)
+ */
+
+.editor-styles-wrapper {
+	font-family: 'Inter', system-ui, sans-serif;
+	font-size: 17px;
+	line-height: 1.7;
+}
+.editor-styles-wrapper h1,
+.editor-styles-wrapper h2,
+.editor-styles-wrapper h3,
+.editor-styles-wrapper h4 {
+	font-family: 'Fraunces', Georgia, serif;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+.editor-styles-wrapper h1 { font-weight: 900; }
+.editor-styles-wrapper .wp-block-quote,
+.editor-styles-wrapper .wp-block-pullquote {
+	font-family: 'Fraunces', Georgia, serif;
+	font-style: italic;
+}

@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: wordpress
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHP checks
+        run: composer test:php
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: '22'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run asset lint
+        run: npm test
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Set up WordPress fixture
+        run: |
+          set -euo pipefail
+          WP_CLI_VERSION=2.11.0
+          WP_CLI_SHA512=adb12146bab8d829621efed41124dcd0012f9027f47e0228be7080296167566070e4a026a09c3989907840b21de94b7a35f3bfbd5f827c12f27c5803546d1bba
+          curl -fsSL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" -o /tmp/wp-cli.phar
+          echo "${WP_CLI_SHA512}  /tmp/wp-cli.phar" | sha512sum -c -
+          WP_CLI="php /tmp/wp-cli.phar --path=/tmp/wordpress"
+          $WP_CLI core download --force
+          $WP_CLI config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --skip-check
+          $WP_CLI db create || true
+          $WP_CLI core install --url=http://127.0.0.1:8888 --title="Hungry Flamingo Smoke" --admin_user=admin --admin_password=password --admin_email=admin@example.com
+          $WP_CLI option update home http://127.0.0.1:8888
+          $WP_CLI option update siteurl http://127.0.0.1:8888
+          ln -s "$GITHUB_WORKSPACE" /tmp/wordpress/wp-content/themes/hungry-flamingo-blog
+          $WP_CLI plugin install woocommerce --version=10.7.0 --activate
+          $WP_CLI theme activate hungry-flamingo-blog
+          $WP_CLI post create --post_type=post --post_status=publish --post_title="Smoke post" --post_content='<!-- wp:heading --><h2>Smoke section</h2><!-- /wp:heading --><!-- wp:paragraph --><p>Smoke body for visual checks.</p><!-- /wp:paragraph -->'
+          SHOP_ID=$($WP_CLI post create --post_type=page --post_status=publish --post_title="Shop" --post_name=shop --porcelain)
+          CART_ID=$($WP_CLI post create --post_type=page --post_status=publish --post_title="Cart" --post_name=cart --post_content='<!-- wp:woocommerce/cart {"align":"wide"} /-->' --porcelain)
+          CHECKOUT_ID=$($WP_CLI post create --post_type=page --post_status=publish --post_title="Checkout" --post_name=checkout --post_content='<!-- wp:woocommerce/checkout {"align":"wide","showFormStepNumbers":true} /-->' --porcelain)
+          ACCOUNT_ID=$($WP_CLI post create --post_type=page --post_status=publish --post_title="My account" --post_name=my-account --post_content='<!-- wp:shortcode -->[woocommerce_my_account]<!-- /wp:shortcode -->' --porcelain)
+          $WP_CLI option update woocommerce_shop_page_id "$SHOP_ID"
+          $WP_CLI option update woocommerce_cart_page_id "$CART_ID"
+          $WP_CLI option update woocommerce_checkout_page_id "$CHECKOUT_ID"
+          $WP_CLI option update woocommerce_myaccount_page_id "$ACCOUNT_ID"
+          $WP_CLI option update woocommerce_coming_soon no || true
+          PRODUCT_ID=$($WP_CLI post create --post_type=product --post_status=publish --post_title="Smoke Product" --post_name=smoke-product --post_content='<!-- wp:paragraph --><p>A test product used by visual smoke checks.</p><!-- /wp:paragraph -->' --post_excerpt="Smoke product excerpt." --porcelain)
+          $WP_CLI post meta update "$PRODUCT_ID" _regular_price 19.00
+          $WP_CLI post meta update "$PRODUCT_ID" _price 19.00
+          $WP_CLI post meta update "$PRODUCT_ID" _stock_status instock
+          $WP_CLI post meta update "$PRODUCT_ID" _manage_stock no
+          $WP_CLI term get product_type simple --by=slug >/dev/null 2>&1 || $WP_CLI term create product_type simple --slug=simple
+          $WP_CLI post term set "$PRODUCT_ID" product_type simple
+          php -S 127.0.0.1:8888 -t /tmp/wordpress >/tmp/wp-server.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8888 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/wp-server.log
+          exit 1
+
+      - name: Run visual smoke tests
+        env:
+          WP_BASE_URL: http://127.0.0.1:8888
+        run: npm run test:visual
+
+      - name: Verify release package
+        run: |
+          set -euo pipefail
+          npm run dist
+          npm run verify:dist
+
+      - name: Upload theme package artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: hungry-flamingo-blog-package
+          path: dist/hungry-flamingo-blog.zip
+          if-no-files-found: error

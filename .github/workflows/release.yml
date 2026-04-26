@@ -1,0 +1,112 @@
+name: Release repair
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing release tag in x.y.z format
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Rebuild release artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Validate target version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ inputs.version }}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must use x.y.z format." >&2
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify target tag exists
+        env:
+          REPOSITORY_GIT_URL: ${{ github.server_url }}/${{ github.repository }}.git
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          git ls-remote --exit-code --tags "$REPOSITORY_GIT_URL" "refs/tags/$VERSION" >/dev/null
+
+      - name: Check out tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: refs/tags/${{ steps.version.outputs.value }}
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist
+          npm ci
+
+      - name: Validate metadata version
+        run: |
+          set -euo pipefail
+          grep -Eq '^Version: ${{ steps.version.outputs.value }}$' style.css
+          grep -Eq '^Stable tag: ${{ steps.version.outputs.value }}$' readme.txt
+
+      - name: Run checks
+        run: |
+          composer test:php
+          npm test
+
+      - name: Build and verify release package
+        run: |
+          npm run dist
+          npm run verify:dist
+
+      - name: Generate release notes
+        run: bash scripts/generate-release-notes.sh "${{ steps.version.outputs.value }}" > dist/release-notes.md
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: hungry-flamingo-blog-${{ steps.version.outputs.value }}
+          path: dist/hungry-flamingo-blog.zip
+          if-no-files-found: error
+
+      - name: Attest package provenance
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32
+        with:
+          subject-path: dist/hungry-flamingo-blog.zip
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            gh release upload "$VERSION" dist/hungry-flamingo-blog.zip --clobber
+            gh release edit "$VERSION" --title "$VERSION" --notes-file dist/release-notes.md
+          else
+            gh release create "$VERSION" dist/hungry-flamingo-blog.zip \
+              --verify-tag \
+              --title "$VERSION" \
+              --notes-file dist/release-notes.md
+          fi
