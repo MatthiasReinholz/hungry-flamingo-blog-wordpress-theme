@@ -1,0 +1,132 @@
+# Copyright (C) 2026 Matthias Reinholz
+# This file is distributed under the GNU General Public License v3.
+msgid ""
+msgstr ""
+"Project-Id-Version: Hungry Flamingo Blog 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hungry-flamingo-blog\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-26T00:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: Hungry Flamingo Blog manual POT seed\n"
+"X-Domain: hungry-flamingo-blog\n"
+
+#. Theme Name of the theme
+msgid "Hungry Flamingo Blog"
+msgstr ""
+
+#. Description of the theme
+msgid "A colorful, editorial block theme for content creators. Uses local CSS font stacks, tuned for longform reading, with WooCommerce compatibility, a light/dark toggle stored in a cookie, dedicated footer, five-item header, mobile menu, and sidebar."
+msgstr ""
+
+#: inc/class-theme.php:41
+msgid "Hungry Flamingo"
+msgstr ""
+
+#. translators: %s: publication date
+#: patterns/hero.php:29
+msgid "Issue — %s"
+msgstr ""
+
+#: parts/header.html
+msgid "Skip to content"
+msgstr ""
+
+#: parts/header.html
+msgid "Search"
+msgstr ""
+
+#: parts/header.html
+msgid "Search terms"
+msgstr ""
+
+#: parts/header.html
+msgid "Search articles"
+msgstr ""
+
+#: parts/header.html
+msgid "Toggle theme"
+msgstr ""
+
+#: parts/header.html
+msgid "Open menu"
+msgstr ""
+
+#: parts/header.html
+msgid "Close menu"
+msgstr ""
+
+#: parts/header.html parts/footer.html
+msgid "This site"
+msgstr ""
+
+#: parts/header.html style.css
+msgid "RSS"
+msgstr ""
+
+#: parts/footer.html
+msgid "Follow along"
+msgstr ""
+
+#: parts/footer.html
+msgid "RSS feed"
+msgstr ""
+
+#: parts/footer.html
+msgid "Explore"
+msgstr ""
+
+#: parts/footer.html
+msgid "Resources"
+msgstr ""
+
+#: parts/footer.html
+msgid "Community"
+msgstr ""
+
+#: parts/footer.html
+msgid "Built with care on WordPress"
+msgstr ""
+
+#: templates/archive.html
+msgid "No articles found."
+msgstr ""
+
+#: templates/index.html
+msgid "Latest in"
+msgstr ""
+
+#: templates/index.html
+msgid "craft"
+msgstr ""
+
+#: templates/index.html
+msgid "No articles yet. Check back soon."
+msgstr ""
+
+#: templates/archive-product.html
+msgid "No products found."
+msgstr ""
+
+#: templates/product-search-results.html
+msgid "No matching products found."
+msgstr ""
+
+#: templates/order-confirmation.html
+msgid "Order details"
+msgstr ""
+
+#: templates/order-confirmation.html
+msgid "Billing address"
+msgstr ""
+
+#: templates/order-confirmation.html
+msgid "Shipping address"
+msgstr ""
+
+#: templates/order-confirmation.html
+msgid "Downloads"
+msgstr ""

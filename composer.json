@@ -1,0 +1,29 @@
+{
+	"name": "matthiasreinholz/hungry-flamingo-blog-wordpress-theme",
+	"description": "A colorful editorial block theme for longform WordPress blogs.",
+	"type": "wordpress-theme",
+	"license": "GPL-3.0-only",
+	"require": {
+		"php": ">=8.2"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"phpcompatibility/php-compatibility": "^9.3",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"squizlabs/php_codesniffer": "^3.11",
+		"wp-coding-standards/wpcs": "^3.1"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"lint:syntax": "find . \\( -path ./vendor -o -path ./node_modules -o -path ./dist \\) -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l",
+		"lint:php": "phpcs --standard=phpcs.xml.dist",
+		"test:php": [
+			"@lint:syntax",
+			"@lint:php"
+		]
+	}
+}
