@@ -11,6 +11,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - Update release metadata and package artifacts.
+- Retry release dependency audits so transient registry timeouts do not block verified package publication.
 
 ## [1.0.0] - 2026-04-27
 
