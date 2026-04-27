@@ -32,7 +32,6 @@ final class Theme {
 		$this->register_modules();
 
 		add_action( 'init', [ $this, 'register_pattern_category' ] );
-		add_filter( 'query_loop_block_query_vars', [ $this, 'exclude_current_post_from_related_query' ], 10, 2 );
 	}
 
 	public function register_pattern_category(): void {
@@ -42,46 +41,6 @@ final class Theme {
 				[ 'label' => __( 'Hungry Flamingo', 'hungry-flamingo-blog' ) ]
 			);
 		}
-	}
-
-	/**
-	 * Prevent the single-post sidebar's related query from linking to itself.
-	 *
-	 * @param array<string,mixed>       $query Query vars prepared for the Query Loop block.
-	 * @param \WP_Block|array<string,mixed> $block Query Loop block instance or parsed block data.
-	 * @return array<string,mixed>
-	 */
-	public function exclude_current_post_from_related_query( array $query, $block ): array {
-		if ( ! is_singular( 'post' ) ) {
-			return $query;
-		}
-
-		$attrs = [];
-		if ( $block instanceof \WP_Block ) {
-			$attrs = isset( $block->parsed_block['attrs'] ) && is_array( $block->parsed_block['attrs'] )
-				? $block->parsed_block['attrs']
-				: [];
-		} elseif ( is_array( $block ) ) {
-			$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : [];
-		}
-
-		$class_name = isset( $attrs['className'] ) && is_string( $attrs['className'] ) ? $attrs['className'] : '';
-
-		if ( ! preg_match( '/(^|\s)related-query(\s|$)/', $class_name ) ) {
-			return $query;
-		}
-
-		$post_id = get_queried_object_id();
-		if ( ! $post_id ) {
-			return $query;
-		}
-
-		$excluded = isset( $query['post__not_in'] ) ? (array) $query['post__not_in'] : [];
-		$excluded = array_filter( array_map( 'absint', $excluded ) );
-		$excluded[] = (int) $post_id;
-		$query['post__not_in'] = array_values( array_unique( $excluded ) );
-
-		return $query;
 	}
 
 	private function register_theme_supports(): void {
