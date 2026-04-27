@@ -10,8 +10,9 @@ if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 
 awk -v version="$version" '
-	$0 ~ "^## " version "([ -]|$)" { in_section = 1; next }
+	$0 ~ "^## \\[" version "\\]" || $0 ~ "^## " version "([ -]|$)" { in_section = 1; next }
 	in_section && /^## / { exit }
+	in_section && /^\[[^]]+\]:/ { exit }
 	in_section { print }
 ' CHANGELOG.md | sed '/^[[:space:]]*$/d' > /tmp/hfb-release-notes-body.txt
 

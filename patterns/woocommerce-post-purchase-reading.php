@@ -7,6 +7,9 @@
  * Inserter: yes
  * Textdomain: hungry-flamingo-blog
  */
+if ( ! class_exists( '\WooCommerce' ) ) {
+	return;
+}
 ?>
 <!-- wp:group {"align":"wide","className":"hfb-commerce-section hfb-post-purchase-reading","layout":{"type":"constrained"}} -->
 <div class="wp-block-group alignwide hfb-commerce-section hfb-post-purchase-reading">

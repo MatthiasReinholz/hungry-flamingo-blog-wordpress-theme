@@ -4,9 +4,9 @@ Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.2
 Stable tag: 1.0.0
-License: GPLv3
+License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Tags: blog, block-theme, full-site-editing, one-column, two-columns, custom-colors, custom-logo, featured-images, threaded-comments, wide-blocks, block-styles, editor-style, news, e-commerce
+Tags: blog, full-site-editing, one-column, two-columns, custom-colors, custom-logo, featured-images, threaded-comments, wide-blocks, block-styles, editor-style, news, e-commerce
 
 A colorful editorial block theme for longform publishing.
 

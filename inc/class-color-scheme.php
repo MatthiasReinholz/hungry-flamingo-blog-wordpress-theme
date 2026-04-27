@@ -41,11 +41,18 @@ final class Color_Scheme {
 	 * that even with JS disabled we render the user's last choice.
 	 */
 	public function html_attributes( string $output ): string {
+		return $output . ' data-theme="' . esc_attr( self::resolve_from_cookie() ) . '"';
+	}
+
+	public static function resolve_from_cookie(): string {
 		$cookie = isset( $_COOKIE[ self::COOKIE_NAME ] )
 			? sanitize_key( wp_unslash( $_COOKIE[ self::COOKIE_NAME ] ) )
 			: '';
-		$default = defined( 'HFB_DEFAULT_SCHEME' ) ? HFB_DEFAULT_SCHEME : 'light';
-		$scheme  = in_array( $cookie, [ 'light', 'dark' ], true ) ? $cookie : $default;
-		return $output . ' data-theme="' . esc_attr( $scheme ) . '"';
+
+		if ( in_array( $cookie, [ 'light', 'dark' ], true ) ) {
+			return $cookie;
+		}
+
+		return defined( 'HFB_DEFAULT_SCHEME' ) ? HFB_DEFAULT_SCHEME : 'light';
 	}
 }

@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest a theme enhancement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What user need would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Keep theme/plugin boundaries in mind. Durable data, forms, blocks, REST, and analytics belong in plugins.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - Theme presentation/templates
+        - WooCommerce presentation only
+        - Companion plugin candidate
+        - Documentation/tooling
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

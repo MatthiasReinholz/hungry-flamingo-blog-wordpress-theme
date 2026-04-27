@@ -22,20 +22,21 @@ Feature logic that creates custom blocks, REST endpoints, data storage, forms, n
 Run these before handing off theme changes:
 
 ```sh
-composer test:php
-npm test
-npm run dist
-HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
+npm run validate
 ```
 
 Visual smoke tests require a running WordPress site:
 
 ```sh
-WP_BASE_URL=http://localhost:8888 npm run test:visual
+bash scripts/setup-wordpress-visual-fixture.sh
+HFB_VISUAL_STRICT_WOO=1 WP_BASE_URL=http://127.0.0.1:8888 npm run test:visual
 ```
+
+Run `composer i18n:pot` after user-facing PHP string changes. If the translation template changes, include `languages/hungry-flamingo-blog.pot` in the patch.
 
 ## Release Hygiene
 
 - Keep `style.css`, `readme.txt`, `README.md`, `CHANGELOG.md`, `LICENSE`, `THIRD-PARTY-NOTICES.md`, and `docs/release-checklist.md` aligned.
 - Check the release ZIP contents after `npm run dist`.
+- Release workflows require annotated version tags and publish the ZIP with SBOM/Sigstore sidecars.
 - Do not commit `dist/`, `vendor/`, or `node_modules/`.

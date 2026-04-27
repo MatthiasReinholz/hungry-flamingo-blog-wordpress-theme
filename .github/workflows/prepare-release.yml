@@ -35,33 +35,73 @@ jobs:
   prepare:
     name: Prepare release PR
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
+      - name: Validate inputs
+        id: inputs
+        env:
+          INPUT_BASE_REF: ${{ inputs.base_ref }}
+          INPUT_RELEASE_TYPE: ${{ inputs.release_type }}
+          INPUT_VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$INPUT_RELEASE_TYPE" in
+            patch|minor|major|custom) ;;
+            *)
+              echo "Unsupported release type: $INPUT_RELEASE_TYPE" >&2
+              exit 1
+              ;;
+          esac
+
+          if [[ ! "$INPUT_BASE_REF" =~ ^(main|release/[0-9]+\.[0-9]+\.[0-9]+|hotfix/[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Base ref must be main, release/x.y.z, or hotfix/x.y.z." >&2
+            exit 1
+          fi
+
+          if [ "$INPUT_RELEASE_TYPE" = "custom" ] && [[ ! "$INPUT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Custom version must use x.y.z format." >&2
+            exit 1
+          fi
+
+          {
+            printf 'base_ref=%s\n' "$INPUT_BASE_REF"
+            printf 'release_type=%s\n' "$INPUT_RELEASE_TYPE"
+            printf 'custom_version=%s\n' "$INPUT_VERSION"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Check out base ref
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ inputs.base_ref }}
+          ref: ${{ steps.inputs.outputs.base_ref }}
           fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f
+        with:
+          php-version: '8.2'
+          tools: composer
 
       - name: Set up Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: '22'
+          cache: npm
 
       - name: Resolve release version
         id: version
+        env:
+          RELEASE_TYPE: ${{ steps.inputs.outputs.release_type }}
+          CUSTOM_VERSION: ${{ steps.inputs.outputs.custom_version }}
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${{ inputs.release_type }}" = "custom" ]; then
-            version="${{ inputs.version }}"
-            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "Custom version must use x.y.z format." >&2
-              exit 1
-            fi
+          if [ "$RELEASE_TYPE" = "custom" ]; then
+            version="$CUSTOM_VERSION"
           else
-            version="$(bash scripts/next-version.sh "${{ inputs.release_type }}")"
+            version="$(bash scripts/next-version.sh "$RELEASE_TYPE")"
           fi
           echo "value=$version" >> "$GITHUB_OUTPUT"
 
@@ -77,12 +117,21 @@ jobs:
             git checkout -B "$RELEASE_BRANCH"
           fi
 
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist
+          npm ci
+
       - name: Bump release metadata
-        run: bash scripts/bump-version.sh "${{ steps.version.outputs.value }}"
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+        run: bash scripts/bump-version.sh "$RELEASE_VERSION"
+
+      - name: Regenerate translation template
+        run: composer i18n:pot
 
       - name: Validate release package
         run: |
-          npm ci
           npm run dist
           HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 
@@ -94,22 +143,26 @@ jobs:
       - name: Commit and push release branch
         env:
           RELEASE_BRANCH: release/${{ steps.version.outputs.value }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
           if [ -n "$(git status --porcelain)" ]; then
-            git add CHANGELOG.md package-lock.json package.json readme.txt style.css
-            git commit -m "Release ${{ steps.version.outputs.value }}"
+            git add CHANGELOG.md languages/hungry-flamingo-blog.pot package-lock.json package.json readme.txt style.css
+            git commit -m "Release $RELEASE_VERSION"
           fi
           git push --set-upstream origin "$RELEASE_BRANCH"
 
       - name: Write release pull request body
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
         run: |
           {
-            echo "This PR prepares Hungry Flamingo Blog ${{ steps.version.outputs.value }}."
+            echo "This PR prepares Hungry Flamingo Blog $RELEASE_VERSION."
             echo
             echo "Included automation:"
             echo "- bump theme metadata in style.css and readme.txt"
             echo "- bump npm package metadata"
+            echo "- update the translation template"
             echo "- add a changelog section for the release"
             echo "- build and verify the clean installable theme artifact"
             echo
@@ -121,9 +174,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_BRANCH: release/${{ steps.version.outputs.value }}
           RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          BASE_REF: ${{ steps.inputs.outputs.base_ref }}
         run: |
           set -euo pipefail
-          existing_pr="$(gh pr list --head "$RELEASE_BRANCH" --base "${{ inputs.base_ref }}" --state open --json url --jq '.[0].url')"
+          existing_pr="$(gh pr list --head "$RELEASE_BRANCH" --base "$BASE_REF" --state open --json url --jq '.[0].url')"
           if [ -n "$existing_pr" ]; then
             gh pr edit "$existing_pr" \
               --title "Release $RELEASE_VERSION" \
@@ -131,7 +185,7 @@ jobs:
             echo "Updated $existing_pr"
           else
             gh pr create \
-              --base "${{ inputs.base_ref }}" \
+              --base "$BASE_REF" \
               --head "$RELEASE_BRANCH" \
               --title "Release $RELEASE_VERSION" \
               --body-file "$RUNNER_TEMP/release-pr.md"

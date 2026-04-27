@@ -13,11 +13,34 @@ defined( 'ABSPATH' ) || exit;
 
 final class WooCommerce {
 
+	use Asset_Version;
+
+	private const BLOCKS = [
+		'woocommerce/product-collection',
+		'woocommerce/product-template',
+		'woocommerce/cart',
+		'woocommerce/checkout',
+		'woocommerce/mini-cart',
+		'woocommerce/featured-product',
+		'woocommerce/handpicked-products',
+	];
+
+	private const PATTERNS = [
+		'hungry-flamingo-blog/woocommerce-cart-trust-band',
+		'hungry-flamingo-blog/woocommerce-featured-product',
+		'hungry-flamingo-blog/woocommerce-post-product-cta',
+		'hungry-flamingo-blog/woocommerce-post-purchase-reading',
+		'hungry-flamingo-blog/woocommerce-product-collection',
+		'hungry-flamingo-blog/woocommerce-product-comparison',
+	];
+
 	public function register(): void {
 		$this->register_theme_supports();
 
+		add_action( 'init', [ $this, 'register_block_styles' ] );
+		add_action( 'init', [ $this, 'maybe_unregister_patterns' ], 100 );
+		add_filter( 'woocommerce_enqueue_styles', [ $this, 'filter_woocommerce_styles' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
-		add_filter( 'render_block', [ $this, 'enqueue_styles_for_woocommerce_block' ], 10, 2 );
 	}
 
 	private function register_theme_supports(): void {
@@ -42,6 +65,35 @@ final class WooCommerce {
 		add_theme_support( 'wc-product-gallery-slider' );
 	}
 
+	public function register_block_styles(): void {
+		if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
+			return;
+		}
+
+		foreach ( self::BLOCKS as $block_name ) {
+			wp_enqueue_block_style(
+				$block_name,
+				[
+					'handle' => 'hfb-woocommerce',
+					'src'    => HFB_URI . 'assets/css/woocommerce.css',
+					'path'   => HFB_DIR . 'assets/css/woocommerce.css',
+					'deps'   => [ 'hfb-theme' ],
+					'ver'    => $this->asset_version( 'assets/css/woocommerce.css' ),
+				]
+			);
+		}
+	}
+
+	public function maybe_unregister_patterns(): void {
+		if ( class_exists( '\WooCommerce' ) || ! function_exists( 'unregister_block_pattern' ) ) {
+			return;
+		}
+
+		foreach ( self::PATTERNS as $pattern_name ) {
+			unregister_block_pattern( $pattern_name );
+		}
+	}
+
 	public function enqueue_styles(): void {
 		if ( ! $this->is_woocommerce_context() ) {
 			return;
@@ -51,19 +103,19 @@ final class WooCommerce {
 	}
 
 	/**
-	 * Ensure inserted WooCommerce blocks/patterns get theme styling outside Woo routes.
+	 * Keep WooCommerce's classic frontend stylesheet bundle off non-commerce
+	 * editorial pages. WooCommerce block/global styles still decide their own
+	 * loading; this only removes the legacy catalog/cart CSS bundle.
 	 *
-	 * @param string              $block_content Rendered block content.
-	 * @param array<string,mixed> $block Parsed block data.
+	 * @param array<string,array<string,string>> $styles Registered WooCommerce styles.
+	 * @return array<string,array<string,string>>
 	 */
-	public function enqueue_styles_for_woocommerce_block( string $block_content, array $block ): string {
-		$block_name = isset( $block['blockName'] ) && is_string( $block['blockName'] ) ? $block['blockName'] : '';
-
-		if ( 0 === strpos( $block_name, 'woocommerce/' ) ) {
-			$this->enqueue_stylesheet();
+	public function filter_woocommerce_styles( array $styles ): array {
+		if ( ! $this->is_woocommerce_context() ) {
+			return [];
 		}
 
-		return $block_content;
+		return $styles;
 	}
 
 	private function enqueue_stylesheet(): void {
@@ -111,19 +163,12 @@ final class WooCommerce {
 			return false;
 		}
 
-		return has_block( 'woocommerce/product-collection', $post )
-			|| has_block( 'woocommerce/product-template', $post )
-			|| has_block( 'woocommerce/cart', $post )
-			|| has_block( 'woocommerce/checkout', $post )
-			|| has_block( 'woocommerce/mini-cart', $post )
-			|| has_block( 'woocommerce/featured-product', $post )
-			|| has_block( 'woocommerce/handpicked-products', $post );
-	}
+		foreach ( self::BLOCKS as $block_name ) {
+			if ( has_block( $block_name, $post ) ) {
+				return true;
+			}
+		}
 
-	private function asset_version( string $path ): string {
-		$full  = HFB_DIR . ltrim( $path, '/' );
-		$mtime = is_readable( $full ) ? @filemtime( $full ) : false;
-
-		return false !== $mtime ? HFB_VERSION . '.' . $mtime : HFB_VERSION;
+		return false;
 	}
 }

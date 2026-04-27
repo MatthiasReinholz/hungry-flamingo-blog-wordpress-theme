@@ -7,6 +7,10 @@
  * Inserter: yes
  * Textdomain: hungry-flamingo-blog
  */
+if ( ! class_exists( '\WooCommerce' ) ) {
+	return;
+}
+
 $hfb_shop_url = home_url( '/' );
 if ( function_exists( 'wc_get_page_permalink' ) ) {
 	$hfb_woocommerce_shop_url = wc_get_page_permalink( 'shop' );

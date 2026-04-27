@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible problem in the Hungry Flamingo Blog theme.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the URL/template, active plugins, and exact actions.
+      placeholder: |
+        1. Activate the theme.
+        2. Open ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: WordPress, PHP, and theme versions
+      placeholder: WordPress 6.9.4, PHP 8.3, Hungry Flamingo Blog 1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context

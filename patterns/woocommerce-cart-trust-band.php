@@ -7,6 +7,9 @@
  * Inserter: yes
  * Textdomain: hungry-flamingo-blog
  */
+if ( ! class_exists( '\WooCommerce' ) ) {
+	return;
+}
 ?>
 <!-- wp:group {"align":"wide","className":"hfb-commerce-trust-band","layout":{"type":"grid","columnCount":3,"minimumColumnWidth":null}} -->
 <div class="wp-block-group alignwide hfb-commerce-trust-band">

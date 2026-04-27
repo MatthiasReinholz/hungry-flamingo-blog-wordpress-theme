@@ -40,6 +40,16 @@ test.describe('Hungry Flamingo Blog smoke checks', () => {
 		await page.locator('#hfb-theme-toggle').click();
 		await expect(page.locator('html')).toHaveAttribute('data-theme', /dark|light/);
 
+		const burger = page.locator('#hfb-burger');
+		if (await burger.isVisible()) {
+			await burger.click();
+			await expect(page.locator('#hfb-mobile-menu')).toBeVisible();
+			await expect(burger).toHaveAttribute('aria-expanded', 'true');
+			await page.keyboard.press('Escape');
+			await expect(page.locator('#hfb-mobile-menu')).toBeHidden();
+		}
+
+		await expect(page.locator('link[href*="woocommerce.css"]')).toHaveCount(0);
 		await runA11y(page);
 	});
 
@@ -67,6 +77,8 @@ test.describe('Hungry Flamingo Blog smoke checks', () => {
 				await expect(authorCard).not.toBeEmpty();
 			}
 		}
+
+		await runA11y(page);
 	});
 
 	test('woocommerce catalog, product, cart, and checkout render', async ({ page }) => {
@@ -77,6 +89,13 @@ test.describe('Hungry Flamingo Blog smoke checks', () => {
 		const productHeading = page.getByRole('heading', { name: 'Smoke Product' }).first();
 		await expect(productHeading).toBeVisible();
 		const catalogProductId = await page.locator('.hfb-store-layout [data-product_id]').first().getAttribute('data-product_id').catch(() => null);
+		await expect(page.locator('.onsale, .wc-block-components-product-sale-badge, .wc-block-grid__product-onsale').first()).toBeVisible();
+		await runA11y(page, '.hfb-store-layout');
+
+		await page.goto('/?product_cat=smoke-category');
+		await requireOrSkipPresent(page, '.hfb-store-layout, .woocommerce', 'WooCommerce product category archive is not available.', strictWooSmoke);
+		await expect(page.getByRole('heading', { name: 'Smoke Product' }).first()).toBeVisible();
+		await expectWooStylesheet(page);
 		await runA11y(page, '.hfb-store-layout');
 
 		await page.goto('/?s=Smoke&post_type=product');
@@ -115,5 +134,10 @@ test.describe('Hungry Flamingo Blog smoke checks', () => {
 		await expect(page.locator('.hfb-checkout-page, .wc-block-checkout, .wp-block-woocommerce-checkout, form.checkout').first()).toBeVisible();
 		await expectWooStylesheet(page);
 		await runA11y(page, '.hfb-checkout-page');
+
+		await page.goto('/?pagename=my-account');
+		await expect(page.locator('.woocommerce-account, .woocommerce-MyAccount-content, .entry-content').first()).toBeVisible();
+		await expectWooStylesheet(page);
+		await runA11y(page);
 	});
 });

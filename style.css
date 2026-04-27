@@ -8,13 +8,15 @@ Version: 1.0.0
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.2
-License: GNU General Public License v3
+License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: hungry-flamingo-blog
-Tags: blog, block-theme, full-site-editing, one-column, two-columns, custom-colors, custom-logo, featured-images, threaded-comments, wide-blocks, block-styles, editor-style, news, e-commerce
+Tags: blog, full-site-editing, one-column, two-columns, custom-colors, custom-logo, featured-images, threaded-comments, wide-blocks, block-styles, editor-style, news, e-commerce
 */
 
 /*
+ * Copyright 2026 Matthias Reinholz.
+ *
  * Stylesheet handled through assets/css/theme.css (enqueued via HFB\Assets).
  * This file only exists to carry the theme header WordPress requires.
  */

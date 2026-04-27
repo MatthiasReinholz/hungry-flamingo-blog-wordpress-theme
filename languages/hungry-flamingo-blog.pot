@@ -1,328 +1,706 @@
 # Copyright (C) 2026 Matthias Reinholz
-# This file is distributed under the GNU General Public License v3.
+# This file is distributed under the GPL-3.0-only.
 msgid ""
 msgstr ""
 "Project-Id-Version: Hungry Flamingo Blog 1.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hungry-flamingo-blog\n"
+"Report-Msgid-Bugs-To: https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/issues\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-26T00:00:00+00:00\n"
+"POT-Creation-Date: \n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: Hungry Flamingo Blog manual POT seed\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: hungry-flamingo-blog\n"
 
 #. Theme Name of the theme
+#: style.css:2
 msgid "Hungry Flamingo Blog"
 msgstr ""
 
+#. Theme URI of the theme
+#: style.css:3
+msgid "https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme"
+msgstr ""
+
 #. Description of the theme
+#: style.css:6
 msgid "A colorful, editorial block theme for content creators. Uses local CSS font stacks, tuned for longform reading, with WooCommerce compatibility, a light/dark toggle stored in a cookie, dedicated footer, five-item header, mobile menu, and sidebar."
 msgstr ""
 
-#: inc/class-theme.php:41
+#. Author of the theme
+#: style.css:4
+msgid "Matthias Reinholz"
+msgstr ""
+
+#. Author URI of the theme
+#: style.css:5
+msgid "https://matthiasreinholz.com/"
+msgstr ""
+
+#: inc/class-block-styles.php:29
+msgid "Accent quote"
+msgstr ""
+
+#: inc/class-block-styles.php:37
+msgid "Flamingo dots"
+msgstr ""
+
+#: inc/class-theme.php:42
 msgid "Hungry Flamingo"
 msgstr ""
 
-#. translators: %s: publication date
-#: patterns/hero.php:29
-msgid "Issue — %s"
+#: patterns/article-card.php:3
+msgctxt "Pattern title"
+msgid "Article card"
 msgstr ""
 
-#: parts/header.html
-msgid "Skip to content"
+#: patterns/error-404.php:3
+msgctxt "Pattern title"
+msgid "404 content"
 msgstr ""
 
-#: parts/header.html
+#: patterns/error-404.php:15
+msgid "404 — this page flew away."
+msgstr ""
+
+#: patterns/error-404.php:19
+msgid "The link might be broken, or the piece has been moved. Try searching, or head home."
+msgstr ""
+
+#: patterns/error-404.php:22
+#: patterns/site-footer.php:46
+#: patterns/site-header.php:42
+#: patterns/site-header.php:50
+#: patterns/site-header.php:90
+#: patterns/site-header.php:98
 msgid "Search"
 msgstr ""
 
-#: parts/header.html
-msgid "Search terms"
+#: patterns/error-404.php:27
+msgid "Go home"
 msgstr ""
 
-#: parts/header.html
-msgid "Search articles"
+#: patterns/hero.php:3
+msgctxt "Pattern title"
+msgid "Home hero — featured + three secondaries"
 msgstr ""
 
-#: parts/header.html
-msgid "Toggle theme"
+#. translators: %s: publication date
+#: patterns/hero.php:27
+#, php-format
+msgid "Issue — %s"
 msgstr ""
 
-#: parts/header.html
-msgid "Open menu"
+#: patterns/latest-section.php:3
+msgctxt "Pattern title"
+msgid "Latest article section"
 msgstr ""
 
-#: parts/header.html
-msgid "Close menu"
-msgstr ""
-
-#: parts/header.html parts/footer.html
-msgid "This site"
-msgstr ""
-
-#: parts/header.html style.css
-msgid "RSS"
-msgstr ""
-
-#: parts/footer.html
-msgid "Follow along"
-msgstr ""
-
-#: parts/footer.html
-msgid "RSS feed"
-msgstr ""
-
-#: parts/footer.html
-msgid "Explore"
-msgstr ""
-
-#: parts/footer.html
-msgid "Resources"
-msgstr ""
-
-#: parts/footer.html
-msgid "Community"
-msgstr ""
-
-#: parts/footer.html
-msgid "Built with care on WordPress"
-msgstr ""
-
-#: templates/archive.html
-msgid "No articles found."
-msgstr ""
-
-#: templates/index.html
+#: patterns/latest-section.php:17
 msgid "Latest in"
 msgstr ""
 
-#: templates/index.html
+#: patterns/latest-section.php:17
 msgid "craft"
 msgstr ""
 
-#: templates/index.html
+#: patterns/latest-section.php:20
+msgid "All articles"
+msgstr ""
+
+#: patterns/latest-section.php:33
 msgid "No articles yet. Check back soon."
 msgstr ""
 
-#: templates/archive-product.html
-msgid "No products found."
+#: patterns/order-confirmation-content.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce order confirmation content"
 msgstr ""
 
-#: templates/product-search-results.html
-msgid "No matching products found."
-msgstr ""
-
-#: templates/order-confirmation.html
+#: patterns/order-confirmation-content.php:17
 msgid "Order details"
 msgstr ""
 
-#: templates/order-confirmation.html
+#: patterns/order-confirmation-content.php:24
 msgid "Billing address"
 msgstr ""
 
-#: templates/order-confirmation.html
+#: patterns/order-confirmation-content.php:32
 msgid "Shipping address"
 msgstr ""
 
-#: templates/order-confirmation.html
+#: patterns/order-confirmation-content.php:39
 msgid "Downloads"
 msgstr ""
 
-#: patterns/woocommerce-featured-product.php
-msgid "Editor pick"
+#: patterns/sidebar-widgets.php:3
+msgctxt "Pattern title"
+msgid "Sidebar — Browse by category"
 msgstr ""
 
-#: patterns/woocommerce-featured-product.php
-msgid "A product worth a closer look"
+#: patterns/site-footer.php:3
+msgctxt "Pattern title"
+msgid "Site footer"
 msgstr ""
 
-#: patterns/woocommerce-featured-product.php
-msgid "Use this section when a product needs editorial context before readers move into the product card."
+#: patterns/site-footer.php:29
+msgid "A blog for writers, readers, and the people who make a living in the quiet space between them."
 msgstr ""
 
-#: patterns/woocommerce-product-collection.php
-msgid "Shop the edit"
+#: patterns/site-footer.php:32
+msgid "Follow along"
 msgstr ""
 
-#: patterns/woocommerce-product-collection.php
-msgid "Latest products"
+#: patterns/site-footer.php:33
+#: patterns/site-footer.php:74
+msgid "RSS feed"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Compare before you choose"
+#: patterns/site-footer.php:41
+msgid "Explore"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Product"
+#: patterns/site-footer.php:43
+msgid "Footer navigation"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Best for"
+#: patterns/site-footer.php:45
+#: patterns/site-header.php:41
+msgid "Articles"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Key detail"
+#: patterns/site-footer.php:47
+#: patterns/site-header.php:43
+#: patterns/site-header.php:59
+msgid "RSS"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Price"
+#: patterns/site-footer.php:56
+msgid "Resources"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Product one"
+#: patterns/site-footer.php:63
+msgid "Community"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Everyday use"
+#: patterns/site-footer.php:72
+msgid "Built with care on WordPress"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Balanced feature set"
+#: patterns/site-header.php:3
+msgctxt "Pattern title"
+msgid "Site header"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Add current price"
+#: patterns/site-header.php:15
+msgid "Skip to content"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Product two"
+#: patterns/site-header.php:40
+msgid "Primary navigation"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Power users"
+#: patterns/site-header.php:53
+msgid "Toggle theme"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Advanced configuration"
+#: patterns/site-header.php:61
+msgid "Open menu"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Product three"
+#: patterns/site-header.php:79
+msgid "Close menu"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Budget pick"
+#: patterns/site-header.php:83
+msgid "Mobile navigation"
 msgstr ""
 
-#: patterns/woocommerce-product-comparison.php
-msgid "Simple and direct"
+#: patterns/site-header.php:91
+msgid "Close search"
 msgstr ""
 
-#: patterns/woocommerce-post-product-cta.php
-msgid "From the shop"
+#: patterns/site-header.php:96
+msgid "Search terms"
 msgstr ""
 
-#: patterns/woocommerce-post-product-cta.php
-msgid "Pair this article with a practical next step"
+#: patterns/site-header.php:97
+msgid "Search articles"
 msgstr ""
 
-#: patterns/woocommerce-post-product-cta.php
-msgid "Replace this text with a short, honest product note that helps readers decide whether the product fits the article."
+#: patterns/site-sidebar.php:3
+msgctxt "Pattern title"
+msgid "Article sidebar"
 msgstr ""
 
-#: patterns/woocommerce-post-product-cta.php
-msgid "View shop"
+#: patterns/site-sidebar.php:13
+msgid "Article sidebar"
 msgstr ""
 
-#: patterns/woocommerce-cart-trust-band.php
+#: patterns/site-sidebar.php:17
+msgid "On this page"
+msgstr ""
+
+#: patterns/site-sidebar.php:20
+msgid "Table of contents"
+msgstr ""
+
+#: patterns/site-sidebar.php:36
+msgid "RSS updates"
+msgstr ""
+
+#: patterns/site-sidebar.php:37
+msgid "Follow new essays."
+msgstr ""
+
+#: patterns/site-sidebar.php:38
+msgid "Use the feed in your reader for every new essay."
+msgstr ""
+
+#: patterns/site-sidebar.php:39
+msgid "Open RSS feed"
+msgstr ""
+
+#: patterns/site-sidebar.php:47
+msgid "Latest articles"
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce — Cart trust band"
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php:19
 msgid "Clear checkout"
 msgstr ""
 
-#: patterns/woocommerce-cart-trust-band.php
+#: patterns/woocommerce-cart-trust-band.php:22
 msgid "Keep payment, delivery, and return expectations concise before the final checkout step."
 msgstr ""
 
-#: patterns/woocommerce-cart-trust-band.php
+#: patterns/woocommerce-cart-trust-band.php:30
 msgid "Support details"
 msgstr ""
 
-#: patterns/woocommerce-cart-trust-band.php
+#: patterns/woocommerce-cart-trust-band.php:33
 msgid "Add the most useful support route for store questions, without adding extra form logic to the theme."
 msgstr ""
 
-#: patterns/woocommerce-cart-trust-band.php
+#: patterns/woocommerce-cart-trust-band.php:41
 msgid "Plain-language policies"
 msgstr ""
 
-#: patterns/woocommerce-cart-trust-band.php
+#: patterns/woocommerce-cart-trust-band.php:44
 msgid "Use this slot for shipping, returns, downloads, or fulfillment notes that reduce checkout uncertainty."
 msgstr ""
 
-#: patterns/woocommerce-post-purchase-reading.php
+#: patterns/woocommerce-featured-product.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce — Featured product editorial"
+msgstr ""
+
+#: patterns/woocommerce-featured-product.php:21
+msgid "Editor pick"
+msgstr ""
+
+#: patterns/woocommerce-featured-product.php:24
+msgid "A product worth a closer look"
+msgstr ""
+
+#: patterns/woocommerce-featured-product.php:27
+msgid "Use this section when a product needs editorial context before readers move into the product card."
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce — Article product callout"
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php:25
+msgid "From the shop"
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php:28
+msgid "Pair this article with a practical next step"
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php:31
+msgid "Replace this text with a short, honest product note that helps readers decide whether the product fits the article."
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php:36
+msgid "View shop"
+msgstr ""
+
+#: patterns/woocommerce-post-purchase-reading.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce — Post-purchase reading"
+msgstr ""
+
+#: patterns/woocommerce-post-purchase-reading.php:17
 msgid "While you wait"
 msgstr ""
 
-#: patterns/woocommerce-post-purchase-reading.php
+#: patterns/woocommerce-post-purchase-reading.php:20
 msgid "Recommend recent articles after purchase without changing WooCommerce order behavior."
 msgstr ""
 
+#: patterns/woocommerce-product-collection.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce — Product collection"
+msgstr ""
+
+#: patterns/woocommerce-product-collection.php:19
+msgid "Shop the edit"
+msgstr ""
+
+#: patterns/woocommerce-product-collection.php:22
+msgid "Latest products"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:3
+msgctxt "Pattern title"
+msgid "WooCommerce — Product comparison"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:17
+msgid "Compare before you choose"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Product"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Best for"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Key detail"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Price"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Product one"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Everyday use"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Balanced feature set"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Add current price"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Product two"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Power users"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Advanced configuration"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Product three"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Budget pick"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php:21
+msgid "Simple and direct"
+msgstr ""
+
+#: theme.json
 #: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Flamingo"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Flamingo Soft"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Flamingo Deep"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Coral"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Lemon"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Teal"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Purple"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Ink"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Base"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Surface"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Surface Alt"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Text"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Text Muted"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Text Subtle"
+msgstr ""
+
+#: theme.json
+#: styles/newsprint.json
+#: styles/signal.json
+msgctxt "Color name"
+msgid "Border"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Flamingo → Coral"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Teal → Purple"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Lemon → Coral"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Purple → Flamingo"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Teal → Lemon"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Ink → Purple"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Inter"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Fraunces"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "JetBrains Mono"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Extra small"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Base"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Medium"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Extra large"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Display"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Headline"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "2XS"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "XS"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "S"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "M"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "L"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "XL"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "2XL"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "3XL"
+msgstr ""
+
+#: theme.json
+msgctxt "Shadow name"
+msgid "Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Shadow name"
+msgid "Medium"
+msgstr ""
+
+#: theme.json
+msgctxt "Shadow name"
+msgid "Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Header"
+msgstr ""
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Footer"
+msgstr ""
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Sidebar"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Blank"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "No sidebar"
+msgstr ""
+
+#: styles/newsprint.json
+msgctxt "Style variation name"
 msgid "Newsprint"
 msgstr ""
 
 #: styles/signal.json
+msgctxt "Style variation name"
 msgid "Signal"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Flamingo"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Flamingo Soft"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Flamingo Deep"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Coral"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Lemon"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Teal"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Purple"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Ink"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Base"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Surface"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Surface Alt"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Text"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Text Muted"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Text Subtle"
-msgstr ""
-
-#: styles/newsprint.json styles/signal.json
-msgid "Border"
 msgstr ""
