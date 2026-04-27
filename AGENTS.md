@@ -25,6 +25,7 @@ Run these before handing off theme changes:
 composer test:php
 npm test
 npm run dist
+HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 ```
 
 Visual smoke tests require a running WordPress site:

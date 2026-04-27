@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/wp/6.9/theme.json",
+	"version": 2,
+	"title": "Newsprint",
+	"settings": {
+		"color": {
+			"palette": [
+				{ "slug": "flamingo", "color": "#C92D55", "name": "Flamingo" },
+				{ "slug": "flamingo-soft", "color": "#F6D8DE", "name": "Flamingo Soft" },
+				{ "slug": "flamingo-deep", "color": "#8F1F3C", "name": "Flamingo Deep" },
+				{ "slug": "coral", "color": "#D96F46", "name": "Coral" },
+				{ "slug": "lemon", "color": "#D9A928", "name": "Lemon" },
+				{ "slug": "teal", "color": "#217B75", "name": "Teal" },
+				{ "slug": "purple", "color": "#6153A6", "name": "Purple" },
+				{ "slug": "ink", "color": "#181715", "name": "Ink" },
+				{ "slug": "base", "color": "#F8F3EA", "name": "Base" },
+				{ "slug": "surface", "color": "#FFFDF8", "name": "Surface" },
+				{ "slug": "surface-2", "color": "#EFE6D9", "name": "Surface Alt" },
+				{ "slug": "text", "color": "#181715", "name": "Text" },
+				{ "slug": "text-muted", "color": "#57524A", "name": "Text Muted" },
+				{ "slug": "text-subtle", "color": "#817A70", "name": "Text Subtle" },
+				{ "slug": "border", "color": "#D8CDBE", "name": "Border" }
+			]
+		}
+	},
+	"styles": {
+		"color": {
+			"background": "var(--wp--preset--color--base)",
+			"text": "var(--wp--preset--color--text)"
+		}
+	}
+}

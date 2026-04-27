@@ -16,6 +16,7 @@ final class Assets {
 	public function register(): void {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend' ] );
 		add_action( 'wp_head', [ $this, 'print_color_scheme_boot' ], 1 );
+		add_filter( 'render_block', [ $this, 'hydrate_dynamic_links' ] );
 	}
 
 	/**
@@ -53,14 +54,43 @@ final class Assets {
 			true
 		);
 
-		wp_localize_script(
-			'hfb-site',
-			'HFB_UI',
+			wp_localize_script(
+				'hfb-site',
+				'HFB_UI',
+				[
+					'homeUrl'     => esc_url_raw( home_url( '/' ) ),
+					'articlesUrl' => esc_url_raw( $this->articles_url() ),
+					'searchUrl'   => esc_url_raw( add_query_arg( 's', '', home_url( '/' ) ) ),
+					'feedUrl'     => esc_url_raw( get_feed_link() ),
+					'siteName'    => wp_strip_all_tags( get_bloginfo( 'name' ) ),
+				]
+			);
+	}
+
+	/**
+	 * Replace marked fallback links with install-path-aware URLs for no-JS users.
+	 *
+	 * @param string $block_content Rendered block content.
+	 */
+	public function hydrate_dynamic_links( string $block_content ): string {
+		if ( false === strpos( $block_content, 'data-hfb-' ) ) {
+			return $block_content;
+		}
+
+		return str_replace(
 			[
-				'homeUrl'  => esc_url_raw( home_url( '/' ) ),
-				'feedUrl'  => esc_url_raw( get_feed_link() ),
-				'siteName' => wp_strip_all_tags( get_bloginfo( 'name' ) ),
-			]
+				'href="/" data-hfb-home-link',
+				'href="/?s=" data-hfb-search-link',
+				'href="/feed/" data-hfb-feed-link',
+				'action="/" data-hfb-search-form',
+			],
+			[
+				'href="' . esc_url( $this->articles_url() ) . '" data-hfb-home-link',
+				'href="' . esc_url( add_query_arg( 's', '', home_url( '/' ) ) ) . '" data-hfb-search-link',
+				'href="' . esc_url( get_feed_link() ) . '" data-hfb-feed-link',
+				'action="' . esc_url( home_url( '/' ) ) . '" data-hfb-search-form',
+			],
+			$block_content
 		);
 	}
 
@@ -74,7 +104,7 @@ final class Assets {
 		$scheme  = in_array( $cookie, [ 'light', 'dark' ], true ) ? $cookie : $default;
 
 		printf(
-			'<script>(function(){try{var c=document.cookie.match(/(?:^|; )hfb_theme=([^;]+)/);var t=c?decodeURIComponent(c[1]):null;if(!t){t=window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme",%s);}})();</script>',
+			'<script>(function(){try{var c=document.cookie.match(/(?:^|; )hfb_theme=([^;]+)/);var t=c?decodeURIComponent(c[1]):null;if(t!=="dark"&&t!=="light"){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme",%s);}})();</script>',
 			wp_json_encode( $scheme )
 		);
 	}
@@ -92,5 +122,17 @@ final class Assets {
 		$full = HFB_DIR . ltrim( $path, '/' );
 		$mtime = is_readable( $full ) ? @filemtime( $full ) : false;
 		return false !== $mtime ? HFB_VERSION . '.' . $mtime : HFB_VERSION;
+	}
+
+	private function articles_url(): string {
+		$posts_page = (int) get_option( 'page_for_posts' );
+		if ( $posts_page > 0 ) {
+			$permalink = get_permalink( $posts_page );
+			if ( is_string( $permalink ) && '' !== $permalink ) {
+				return $permalink;
+			}
+		}
+
+		return home_url( '/' );
 	}
 }

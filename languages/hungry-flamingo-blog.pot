@@ -130,3 +130,199 @@ msgstr ""
 #: templates/order-confirmation.html
 msgid "Downloads"
 msgstr ""
+
+#: patterns/woocommerce-featured-product.php
+msgid "Editor pick"
+msgstr ""
+
+#: patterns/woocommerce-featured-product.php
+msgid "A product worth a closer look"
+msgstr ""
+
+#: patterns/woocommerce-featured-product.php
+msgid "Use this section when a product needs editorial context before readers move into the product card."
+msgstr ""
+
+#: patterns/woocommerce-product-collection.php
+msgid "Shop the edit"
+msgstr ""
+
+#: patterns/woocommerce-product-collection.php
+msgid "Latest products"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Compare before you choose"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Product"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Best for"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Key detail"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Price"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Product one"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Everyday use"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Balanced feature set"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Add current price"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Product two"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Power users"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Advanced configuration"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Product three"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Budget pick"
+msgstr ""
+
+#: patterns/woocommerce-product-comparison.php
+msgid "Simple and direct"
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php
+msgid "From the shop"
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php
+msgid "Pair this article with a practical next step"
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php
+msgid "Replace this text with a short, honest product note that helps readers decide whether the product fits the article."
+msgstr ""
+
+#: patterns/woocommerce-post-product-cta.php
+msgid "View shop"
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php
+msgid "Clear checkout"
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php
+msgid "Keep payment, delivery, and return expectations concise before the final checkout step."
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php
+msgid "Support details"
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php
+msgid "Add the most useful support route for store questions, without adding extra form logic to the theme."
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php
+msgid "Plain-language policies"
+msgstr ""
+
+#: patterns/woocommerce-cart-trust-band.php
+msgid "Use this slot for shipping, returns, downloads, or fulfillment notes that reduce checkout uncertainty."
+msgstr ""
+
+#: patterns/woocommerce-post-purchase-reading.php
+msgid "While you wait"
+msgstr ""
+
+#: patterns/woocommerce-post-purchase-reading.php
+msgid "Recommend recent articles after purchase without changing WooCommerce order behavior."
+msgstr ""
+
+#: styles/newsprint.json
+msgid "Newsprint"
+msgstr ""
+
+#: styles/signal.json
+msgid "Signal"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Flamingo"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Flamingo Soft"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Flamingo Deep"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Coral"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Lemon"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Teal"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Purple"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Ink"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Base"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Surface"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Surface Alt"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Text"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Text Muted"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Text Subtle"
+msgstr ""
+
+#: styles/newsprint.json styles/signal.json
+msgid "Border"
+msgstr ""

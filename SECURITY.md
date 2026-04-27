@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Security fixes target the latest unreleased `main` branch until the first tagged release. After 1.0.0, only the latest minor release line is supported.
+Security fixes target the latest unreleased `main` branch until the first stable `1.0.0` release. Beta prerelease tags receive best-effort fixes through follow-up prereleases; after stable `1.0.0`, only the latest minor release line is supported.
 
 ## Reporting a Vulnerability
 

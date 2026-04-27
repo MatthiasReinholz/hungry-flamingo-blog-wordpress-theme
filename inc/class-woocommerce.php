@@ -17,6 +17,7 @@ final class WooCommerce {
 		$this->register_theme_supports();
 
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
+		add_filter( 'render_block', [ $this, 'enqueue_styles_for_woocommerce_block' ], 10, 2 );
 	}
 
 	private function register_theme_supports(): void {
@@ -46,6 +47,26 @@ final class WooCommerce {
 			return;
 		}
 
+		$this->enqueue_stylesheet();
+	}
+
+	/**
+	 * Ensure inserted WooCommerce blocks/patterns get theme styling outside Woo routes.
+	 *
+	 * @param string              $block_content Rendered block content.
+	 * @param array<string,mixed> $block Parsed block data.
+	 */
+	public function enqueue_styles_for_woocommerce_block( string $block_content, array $block ): string {
+		$block_name = isset( $block['blockName'] ) && is_string( $block['blockName'] ) ? $block['blockName'] : '';
+
+		if ( 0 === strpos( $block_name, 'woocommerce/' ) ) {
+			$this->enqueue_stylesheet();
+		}
+
+		return $block_content;
+	}
+
+	private function enqueue_stylesheet(): void {
 		wp_enqueue_style(
 			'hfb-woocommerce',
 			HFB_URI . 'assets/css/woocommerce.css',
@@ -63,7 +84,8 @@ final class WooCommerce {
 			|| ( function_exists( 'is_cart' ) && is_cart() )
 			|| ( function_exists( 'is_checkout' ) && is_checkout() )
 			|| ( function_exists( 'is_account_page' ) && is_account_page() )
-			|| $this->is_product_search();
+			|| $this->is_product_search()
+			|| $this->has_woocommerce_blocks();
 	}
 
 	private function is_product_search(): bool {
@@ -77,6 +99,25 @@ final class WooCommerce {
 		}
 
 		return 'product' === $post_type;
+	}
+
+	private function has_woocommerce_blocks(): bool {
+		if ( ! is_singular() ) {
+			return false;
+		}
+
+		$post = get_post();
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		return has_block( 'woocommerce/product-collection', $post )
+			|| has_block( 'woocommerce/product-template', $post )
+			|| has_block( 'woocommerce/cart', $post )
+			|| has_block( 'woocommerce/checkout', $post )
+			|| has_block( 'woocommerce/mini-cart', $post )
+			|| has_block( 'woocommerce/featured-product', $post )
+			|| has_block( 'woocommerce/handpicked-products', $post );
 	}
 
 	private function asset_version( string $path ): string {
