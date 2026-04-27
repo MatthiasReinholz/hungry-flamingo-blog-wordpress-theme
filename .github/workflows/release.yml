@@ -101,9 +101,7 @@ jobs:
           grep -Eq "^Stable tag: ${VERSION}$" readme.txt
 
       - name: Run audits
-        run: |
-          composer audit
-          npm audit --audit-level=high
+        run: bash scripts/run-security-audits.sh
 
       - name: Validate source and package
         run: npm run validate

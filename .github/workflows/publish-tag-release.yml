@@ -131,9 +131,7 @@ jobs:
 
       - name: Run audits
         if: ${{ steps.version.outputs.supported == 'true' }}
-        run: |
-          composer audit
-          npm audit --audit-level=high
+        run: bash scripts/run-security-audits.sh
 
       - name: Validate source and package
         if: ${{ steps.version.outputs.supported == 'true' }}

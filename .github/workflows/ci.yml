@@ -58,9 +58,7 @@ jobs:
           npm ci
 
       - name: Run dependency audits
-        run: |
-          composer audit
-          npm audit --audit-level=high
+        run: bash scripts/run-security-audits.sh
 
       - name: Run validation suite
         run: npm run validate
