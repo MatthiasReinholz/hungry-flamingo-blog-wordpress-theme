@@ -10,20 +10,28 @@
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
 		"phpcompatibility/php-compatibility": "^9.3",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpunit/phpunit": "^10.5",
 		"squizlabs/php_codesniffer": "^3.11",
+		"wp-cli/wp-cli-bundle": "^2.12",
 		"wp-coding-standards/wpcs": "^3.1"
 	},
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"platform": {
+			"php": "8.2.30"
 		}
 	},
 	"scripts": {
 		"lint:syntax": "find . \\( -path ./vendor -o -path ./node_modules -o -path ./dist \\) -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l",
 		"lint:php": "phpcs --standard=phpcs.xml.dist",
+		"i18n:pot": "bash scripts/generate-pot.sh",
+		"test:php:unit": "phpunit --configuration phpunit.xml.dist",
 		"test:php": [
 			"@lint:syntax",
-			"@lint:php"
+			"@lint:php",
+			"@test:php:unit"
 		]
 	}
 }

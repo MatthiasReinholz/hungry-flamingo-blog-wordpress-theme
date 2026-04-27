@@ -29,7 +29,7 @@
 				{ "slug": "surface-2",     "color": "#FFF4E8", "name": "Surface Alt" },
 				{ "slug": "text",          "color": "#141521", "name": "Text" },
 				{ "slug": "text-muted",    "color": "#5A5D72", "name": "Text Muted" },
-				{ "slug": "text-subtle",   "color": "#8A8D9E", "name": "Text Subtle" },
+				{ "slug": "text-subtle",   "color": "#5A5D72", "name": "Text Subtle" },
 				{ "slug": "border",        "color": "#EBE4DA", "name": "Border" }
 			],
 			"gradients": [
@@ -129,10 +129,10 @@
 		},
 		"elements": {
 			"link": {
-				"color": { "text": "var(--wp--preset--color--flamingo)" },
+				"color": { "text": "var(--wp--preset--color--flamingo-deep)" },
 				"typography": { "fontWeight": "500" },
 				":hover": {
-					"color": { "text": "var(--wp--preset--color--flamingo-deep)" }
+					"color": { "text": "var(--wp--preset--color--purple)" }
 				}
 			},
 			"h1": {
@@ -141,7 +141,7 @@
 					"fontSize":   "var(--wp--preset--font-size--3xl)",
 					"fontWeight": "900",
 					"lineHeight": "1.1",
-					"letterSpacing": "-0.02em"
+					"letterSpacing": "0"
 				}
 			},
 			"h2": {
@@ -150,7 +150,7 @@
 					"fontSize":   "var(--wp--preset--font-size--2xl)",
 					"fontWeight": "700",
 					"lineHeight": "1.15",
-					"letterSpacing": "-0.02em"
+					"letterSpacing": "0"
 				}
 			},
 			"h3": {
@@ -180,7 +180,7 @@
 				},
 				"typography": { "fontWeight": "600" },
 				":hover": {
-					"color": { "background": "var(--wp--preset--color--flamingo-deep)" }
+					"color": { "background": "var(--wp--preset--color--ink)" }
 				}
 			}
 		},

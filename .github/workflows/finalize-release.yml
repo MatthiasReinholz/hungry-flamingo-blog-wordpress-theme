@@ -21,7 +21,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       (startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/'))
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     services:
       mysql:
         image: mysql:8.4
@@ -46,6 +46,7 @@ jobs:
         id: release
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        shell: bash
         run: |
           set -euo pipefail
           if [[ "$HEAD_REF" =~ ^(release|hotfix)/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
@@ -60,6 +61,25 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify merged pull request commit
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$(git rev-parse HEAD)" != "$MERGE_COMMIT" ]; then
+            echo "Checked-out commit does not match the merged PR commit." >&2
+            exit 1
+          fi
+
+          read -r -a parents <<< "$(git show -s --format=%P "$MERGE_COMMIT")"
+          if [ "${#parents[@]}" -ge 2 ] && [ "${parents[1]}" != "$HEAD_SHA" ]; then
+            echo "Merged PR second parent ${parents[1]} does not match reviewed head $HEAD_SHA." >&2
+            exit 1
+          fi
 
       - name: Set up PHP
         uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f
@@ -71,27 +91,28 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: '22'
+          cache: npm
 
       - name: Validate metadata version
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -euo pipefail
-          grep -Eq '^Version: ${{ steps.release.outputs.version }}$' style.css
-          grep -Eq '^Stable tag: ${{ steps.release.outputs.version }}$' readme.txt
+          grep -Eq "^Version: ${RELEASE_VERSION}$" style.css
+          grep -Eq "^Stable tag: ${RELEASE_VERSION}$" readme.txt
 
       - name: Install dependencies
         run: |
           composer install --no-interaction --prefer-dist
           npm ci
 
-      - name: Run checks
+      - name: Run audits
         run: |
-          composer test:php
-          npm test
+          composer audit
+          npm audit --audit-level=high
 
-      - name: Build and verify release package
-        run: |
-          npm run dist
-          HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
+      - name: Validate source and package
+        run: npm run validate
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
@@ -107,14 +128,34 @@ jobs:
           WP_BASE_URL: http://127.0.0.1:8888
         run: npm run test:visual
 
+      - name: Run Theme Check
+        env:
+          HFB_THEME_SOURCE: ${{ github.workspace }}/dist/package/hungry-flamingo-blog
+        run: bash scripts/run-theme-check.sh
+
       - name: Generate release notes
-        run: bash scripts/generate-release-notes.sh "${{ steps.release.outputs.version }}" > dist/release-notes.md
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: bash scripts/generate-release-notes.sh "$RELEASE_VERSION" > dist/release-notes.md
+
+      - name: Install release security tools
+        run: |
+          bash scripts/install-release-security-tools.sh "$RUNNER_TEMP/hfb-release-tools"
+          echo "$RUNNER_TEMP/hfb-release-tools" >> "$GITHUB_PATH"
+
+      - name: Generate release sidecars
+        run: |
+          bash scripts/generate-sbom.sh dist/package/hungry-flamingo-blog dist/hungry-flamingo-blog.zip.sbom.cdx.json
+          bash scripts/sign-release.sh dist/hungry-flamingo-blog.zip dist/hungry-flamingo-blog.zip.sigstore.json
 
       - name: Upload package artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: hungry-flamingo-blog-${{ steps.release.outputs.version }}
-          path: dist/hungry-flamingo-blog.zip
+          path: |
+            dist/hungry-flamingo-blog.zip
+            dist/hungry-flamingo-blog.zip.sbom.cdx.json
+            dist/hungry-flamingo-blog.zip.sigstore.json
           if-no-files-found: error
 
       - name: Attest package provenance
@@ -152,23 +193,35 @@ jobs:
 
       - name: Create annotated tag
         if: ${{ steps.tag.outputs.exists != 'true' }}
-        run: git -c tag.gpgsign=false tag -a "${{ steps.release.outputs.version }}" -m "Release ${{ steps.release.outputs.version }}"
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: git -c tag.gpgsign=false tag -a "$VERSION" -m "Release $VERSION"
 
       - name: Push tag
         if: ${{ steps.tag.outputs.exists != 'true' }}
-        run: git push origin "${{ steps.release.outputs.version }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/$VERSION"
 
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
         run: |
           set -euo pipefail
+          release_assets=(
+            dist/hungry-flamingo-blog.zip
+            dist/hungry-flamingo-blog.zip.sbom.cdx.json
+            dist/hungry-flamingo-blog.zip.sigstore.json
+          )
+
           if gh release view "$VERSION" >/dev/null 2>&1; then
-            gh release upload "$VERSION" dist/hungry-flamingo-blog.zip --clobber
+            gh release upload "$VERSION" "${release_assets[@]}" --clobber
             gh release edit "$VERSION" --title "$VERSION" --notes-file dist/release-notes.md --draft=false --prerelease=false --latest
           else
-            gh release create "$VERSION" dist/hungry-flamingo-blog.zip \
+            gh release create "$VERSION" "${release_assets[@]}" \
               --verify-tag \
               --title "$VERSION" \
               --latest \
@@ -180,11 +233,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.release.outputs.version }}
         run: |
-          set -euo pipefail
-          gh release view "$VERSION" \
-            --json isDraft,isPrerelease,assets \
-            --jq '
-              if .isDraft then error("release is still a draft") else . end
-              | if .isPrerelease then error("stable release was marked prerelease") else . end
-              | if ([.assets[] | select(.name == "hungry-flamingo-blog.zip" and .size > 0)] | length) != 1 then error("missing installable ZIP asset") else "verified" end
-            '
+          bash scripts/verify-github-release-assets.sh "$VERSION" false \
+            dist/hungry-flamingo-blog.zip \
+            dist/hungry-flamingo-blog.zip.sbom.cdx.json \
+            dist/hungry-flamingo-blog.zip.sigstore.json
+
+      - name: Upload Playwright report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: playwright-report-finalize-release
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore

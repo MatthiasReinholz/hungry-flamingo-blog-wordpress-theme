@@ -1,5 +1,10 @@
 # Hungry Flamingo Blog
 
+[![CI](https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/actions/workflows/ci.yml/badge.svg)](https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme)](https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/releases)
+[![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
+[![WordPress Tested](https://img.shields.io/badge/WordPress-tested%20to%206.9-blue.svg)](readme.txt)
+
 Hungry Flamingo Blog is a colorful block theme for editorial blogs and longform publishing. It includes full-site-editing templates, block patterns, a dark/light color toggle, a mobile navigation overlay, and polished single-article layouts.
 
 ## Requirements
@@ -42,17 +47,21 @@ See [docs/editorial-workflow.md](docs/editorial-workflow.md) for template/patter
 
 ```sh
 composer install
-composer test:php
 npm install
-npm test
-npm run dist
-HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
+npm run validate
 ```
 
 Visual smoke tests expect a running WordPress site:
 
 ```sh
-WP_BASE_URL=http://localhost:8888 npm run test:visual
+bash scripts/setup-wordpress-visual-fixture.sh
+HFB_VISUAL_STRICT_WOO=1 WP_BASE_URL=http://127.0.0.1:8888 npm run test:visual
+```
+
+Regenerate the translation template after any user-facing string change:
+
+```sh
+composer i18n:pot
 ```
 
 The visual smoke suite includes accessibility checks and optional WooCommerce coverage. WooCommerce tests are skipped when the running WordPress fixture does not expose product, cart, and checkout pages.
@@ -73,7 +82,7 @@ Use the GitHub Actions release flow for production artifacts:
 - `Release repair` rebuilds and republishes the artifact for an existing tag.
 - `Publish tag release` is a safety net for pushed prerelease semver tags such as `v1.0.0-beta.1`. It creates or repairs the GitHub prerelease and uploads the verified installable ZIP so a prerelease tag does not remain tag-only. Stable `x.y.z` tags are published by the release PR/finalize flow, not by tag push.
 
-All release publication flows build the clean package through `scripts/build-theme-zip.sh` and verify it through `scripts/verify-release-package.sh`.
+All release publication flows build the clean package through `scripts/build-theme-zip.sh` and verify it through `scripts/verify-release-package.sh`. Stable and prerelease publications also attach a CycloneDX SBOM and keyless Sigstore bundle next to the installable ZIP.
 
 Prerelease tags package the matching stable WordPress metadata version. For example, `v1.0.0-beta.1` installs as theme version `1.0.0` while GitHub marks the artifact as a prerelease for tester distribution.
 
@@ -89,4 +98,4 @@ See [docs/release-checklist.md](docs/release-checklist.md).
 
 ## License
 
-GNU General Public License v3. See [LICENSE](LICENSE).
+GPL-3.0-only. See [LICENSE](LICENSE).

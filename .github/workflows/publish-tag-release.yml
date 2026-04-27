@@ -3,7 +3,7 @@ name: Publish tag release
 on:
   push:
     tags:
-      - '*'
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ jobs:
   release:
     name: Publish GitHub release for version tag
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     services:
       mysql:
         image: mysql:8.4
@@ -42,8 +42,8 @@ jobs:
         run: |
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
-          if [[ ! "$tag" =~ ^v?([0-9]+\.[0-9]+\.[0-9]+)(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
-            echo "Tag $tag is not a release version tag; skipping."
+          if [[ ! "$tag" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "Tag $tag is not a supported release version tag; skipping."
             echo "supported=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -63,6 +63,19 @@ jobs:
         with:
           ref: refs/tags/${{ steps.version.outputs.tag }}
           fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify tag is annotated
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        env:
+          TAG_NAME: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --tags origin
+          if [ "$(git cat-file -t "refs/tags/$TAG_NAME")" != "tag" ]; then
+            echo "Tag $TAG_NAME exists but is not an annotated tag." >&2
+            exit 1
+          fi
 
       - name: Verify tag comes from trusted history
         if: ${{ steps.version.outputs.supported == 'true' }}
@@ -99,6 +112,7 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: '22'
+          cache: npm
 
       - name: Install dependencies
         if: ${{ steps.version.outputs.supported == 'true' }}
@@ -115,17 +129,15 @@ jobs:
           grep -Eq "^Version: ${BASE_VERSION}$" style.css
           grep -Eq "^Stable tag: ${BASE_VERSION}$" readme.txt
 
-      - name: Run checks
+      - name: Run audits
         if: ${{ steps.version.outputs.supported == 'true' }}
         run: |
-          composer test:php
-          npm test
+          composer audit
+          npm audit --audit-level=high
 
-      - name: Build and verify release package
+      - name: Validate source and package
         if: ${{ steps.version.outputs.supported == 'true' }}
-        run: |
-          npm run dist
-          HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
+        run: npm run validate
 
       - name: Install Playwright browser
         if: ${{ steps.version.outputs.supported == 'true' }}
@@ -144,6 +156,12 @@ jobs:
           WP_BASE_URL: http://127.0.0.1:8888
         run: npm run test:visual
 
+      - name: Run Theme Check
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        env:
+          HFB_THEME_SOURCE: ${{ github.workspace }}/dist/package/hungry-flamingo-blog
+        run: bash scripts/run-theme-check.sh
+
       - name: Generate release notes
         if: ${{ steps.version.outputs.supported == 'true' }}
         env:
@@ -152,19 +170,32 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/generate-release-notes.sh "$BASE_VERSION" > dist/release-notes.md
-          if [ "$TAG_NAME" != "$BASE_VERSION" ]; then
-            {
-              printf '\n## Tag\n\n'
-              printf 'This release was published from `%s` and packages theme metadata version `%s`.\n' "$TAG_NAME" "$BASE_VERSION"
-            } >> dist/release-notes.md
-          fi
+          {
+            printf '\n## Tag\n\n'
+            printf 'This prerelease was published from `%s` and packages theme metadata version `%s`.\n' "$TAG_NAME" "$BASE_VERSION"
+          } >> dist/release-notes.md
+
+      - name: Install release security tools
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        run: |
+          bash scripts/install-release-security-tools.sh "$RUNNER_TEMP/hfb-release-tools"
+          echo "$RUNNER_TEMP/hfb-release-tools" >> "$GITHUB_PATH"
+
+      - name: Generate release sidecars
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        run: |
+          bash scripts/generate-sbom.sh dist/package/hungry-flamingo-blog dist/hungry-flamingo-blog.zip.sbom.cdx.json
+          bash scripts/sign-release.sh dist/hungry-flamingo-blog.zip dist/hungry-flamingo-blog.zip.sigstore.json
 
       - name: Upload package artifact
         if: ${{ steps.version.outputs.supported == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: hungry-flamingo-blog-${{ steps.version.outputs.tag }}
-          path: dist/hungry-flamingo-blog.zip
+          path: |
+            dist/hungry-flamingo-blog.zip
+            dist/hungry-flamingo-blog.zip.sbom.cdx.json
+            dist/hungry-flamingo-blog.zip.sigstore.json
           if-no-files-found: error
 
       - name: Attest package provenance
@@ -178,22 +209,25 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ steps.version.outputs.tag }}
-          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        shell: bash
         run: |
           set -euo pipefail
-          edit_flags=(--title "$TAG_NAME" --notes-file dist/release-notes.md --draft=false)
-          create_flags=(--verify-tag --title "$TAG_NAME" --notes-file dist/release-notes.md)
-          edit_flags+=(--prerelease --latest=false)
-          create_flags+=(--prerelease --latest=false)
+          release_assets=(
+            dist/hungry-flamingo-blog.zip
+            dist/hungry-flamingo-blog.zip.sbom.cdx.json
+            dist/hungry-flamingo-blog.zip.sigstore.json
+          )
+          edit_flags=(--title "$TAG_NAME" --notes-file dist/release-notes.md --draft=false --prerelease --latest=false)
+          create_flags=(--verify-tag --title "$TAG_NAME" --notes-file dist/release-notes.md --prerelease --latest=false)
 
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            gh release upload "$TAG_NAME" dist/hungry-flamingo-blog.zip --clobber
+            gh release upload "$TAG_NAME" "${release_assets[@]}" --clobber
             gh release edit "$TAG_NAME" "${edit_flags[@]}"
             exit 0
           fi
 
-          if ! gh release create "$TAG_NAME" dist/hungry-flamingo-blog.zip "${create_flags[@]}"; then
-            gh release upload "$TAG_NAME" dist/hungry-flamingo-blog.zip --clobber
+          if ! gh release create "$TAG_NAME" "${release_assets[@]}" "${create_flags[@]}"; then
+            gh release upload "$TAG_NAME" "${release_assets[@]}" --clobber
             gh release edit "$TAG_NAME" "${edit_flags[@]}"
           fi
 
@@ -202,13 +236,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ steps.version.outputs.tag }}
-          PRERELEASE: ${{ steps.version.outputs.prerelease }}
         run: |
-          set -euo pipefail
-          gh release view "$TAG_NAME" \
-            --json isDraft,isPrerelease,assets \
-            --jq '
-              if .isDraft then error("release is still a draft") else . end
-              | if .isPrerelease != (env.PRERELEASE == "true") then error("unexpected prerelease flag") else . end
-              | if ([.assets[] | select(.name == "hungry-flamingo-blog.zip" and .size > 0)] | length) != 1 then error("missing installable ZIP asset") else "verified" end
-            '
+          bash scripts/verify-github-release-assets.sh "$TAG_NAME" true \
+            dist/hungry-flamingo-blog.zip \
+            dist/hungry-flamingo-blog.zip.sbom.cdx.json \
+            dist/hungry-flamingo-blog.zip.sigstore.json
+
+      - name: Upload Playwright report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: playwright-report-publish-tag-release
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore

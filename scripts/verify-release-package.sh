@@ -3,10 +3,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SLUG="hungry-flamingo-blog"
+# shellcheck source=lib/meta.sh
+. "$ROOT_DIR/scripts/lib/meta.sh"
 DIST_DIR="$ROOT_DIR/dist"
-PACKAGE_DIR="$DIST_DIR/package/$SLUG"
-ZIP_FILE="$DIST_DIR/$SLUG.zip"
+PACKAGE_DIR="$ROOT_DIR/$HFB_PACKAGE_DIR"
+ZIP_FILE="$DIST_DIR/$HFB_ZIP_FILE"
 
 if [ "${HFB_VERIFY_SKIP_BUILD:-}" != "1" ]; then
 	npm run dist >/dev/null
@@ -73,18 +74,18 @@ trap 'rm -f "$zip_listing"' EXIT
 unzip -Z1 "$ZIP_FILE" > "$zip_listing"
 
 required_zip_entries=(
-	"$SLUG/style.css"
-	"$SLUG/theme.json"
-	"$SLUG/readme.txt"
-	"$SLUG/screenshot.png"
-	"$SLUG/languages/hungry-flamingo-blog.pot"
-	"$SLUG/assets/css/woocommerce.css"
-	"$SLUG/templates/archive-product.html"
-	"$SLUG/templates/single-product.html"
-	"$SLUG/templates/page-cart.html"
-	"$SLUG/templates/page-checkout.html"
-	"$SLUG/templates/order-confirmation.html"
-	"$SLUG/templates/product-search-results.html"
+	"$HFB_SLUG/style.css"
+	"$HFB_SLUG/theme.json"
+	"$HFB_SLUG/readme.txt"
+	"$HFB_SLUG/screenshot.png"
+	"$HFB_SLUG/languages/hungry-flamingo-blog.pot"
+	"$HFB_SLUG/assets/css/woocommerce.css"
+	"$HFB_SLUG/templates/archive-product.html"
+	"$HFB_SLUG/templates/single-product.html"
+	"$HFB_SLUG/templates/page-cart.html"
+	"$HFB_SLUG/templates/page-checkout.html"
+	"$HFB_SLUG/templates/order-confirmation.html"
+	"$HFB_SLUG/templates/product-search-results.html"
 )
 
 for entry in "${required_zip_entries[@]}"; do
@@ -115,7 +116,31 @@ if grep -RInE 'fonts\.googleapis\.com|fonts\.gstatic\.com' "$PACKAGE_DIR"; then
 	exit 1
 fi
 
+if grep -RInE 'https?://' "$PACKAGE_DIR/assets" "$PACKAGE_DIR/parts" "$PACKAGE_DIR/patterns" "$PACKAGE_DIR/templates"; then
+	echo "Release package contains runtime remote URL references in templates, patterns, or assets." >&2
+	exit 1
+fi
+
 grep -Fq 'hfb_theme' "$PACKAGE_DIR/readme.txt"
 file "$ROOT_DIR/screenshot.png" | grep -F '1200 x 900' >/dev/null
+
+screenshot_bytes="$(wc -c < "$PACKAGE_DIR/screenshot.png" | tr -d ' ')"
+if [ "$screenshot_bytes" -gt 150000 ]; then
+	echo "screenshot.png is ${screenshot_bytes} bytes; keep it at or below 150 KB." >&2
+	exit 1
+fi
+
+while IFS= read -r asset; do
+	bytes="$(wc -c < "$asset" | tr -d ' ')"
+	case "$asset" in
+		*.css) budget=70000 ;;
+		*.js) budget=20000 ;;
+		*) continue ;;
+	esac
+	if [ "$bytes" -gt "$budget" ]; then
+		echo "Release asset ${asset#$PACKAGE_DIR/} is ${bytes} bytes; budget is ${budget} bytes." >&2
+		exit 1
+	fi
+done < <(find "$PACKAGE_DIR/assets/css" "$PACKAGE_DIR/assets/js" -type f \( -name '*.css' -o -name '*.js' \))
 
 echo "Verified $ZIP_FILE and $PACKAGE_DIR"

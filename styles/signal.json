@@ -18,7 +18,7 @@
 				{ "slug": "surface-2", "color": "#E9F1F4", "name": "Surface Alt" },
 				{ "slug": "text", "color": "#10131A", "name": "Text" },
 				{ "slug": "text-muted", "color": "#46505A", "name": "Text Muted" },
-				{ "slug": "text-subtle", "color": "#78838E", "name": "Text Subtle" },
+				{ "slug": "text-subtle", "color": "#4F5C68", "name": "Text Subtle" },
 				{ "slug": "border", "color": "#D6E0E4", "name": "Border" }
 			]
 		}

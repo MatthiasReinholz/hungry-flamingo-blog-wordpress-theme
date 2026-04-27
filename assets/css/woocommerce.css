@@ -81,7 +81,7 @@
 	border: 0;
 	border-radius: 999px;
 	background: var(--hf-flamingo-deep);
-	color: #fff;
+	color: #ffffff;
 	font-weight: 800;
 	line-height: 1.2;
 	text-decoration: none;
@@ -93,7 +93,11 @@
 .hfb-store-layout .wc-block-components-button,
 .hfb-store-layout .wc-block-components-product-button__button {
 	background: var(--hf-flamingo-deep);
-	color: #fff;
+	color: #ffffff;
+}
+
+.hfb-store-layout .wc-block-components-product-button__button span {
+	color: #ffffff;
 }
 
 :where(
@@ -106,7 +110,7 @@
 	.wp-block-woocommerce-product-button .wp-element-button
 ):hover {
 	background: var(--hf-flamingo-deep);
-	color: #fff;
+	color: #ffffff;
 	transform: translateY(-1px);
 }
 
@@ -252,8 +256,8 @@
 	padding: 5px 10px;
 	border: 0;
 	border-radius: 999px;
-	background: var(--hf-lemon);
-	color: var(--hf-ink);
+	background: var(--hf-flamingo-deep) !important;
+	color: #ffffff !important;
 	font-size: 12px;
 	font-weight: 800;
 	line-height: 1.2;

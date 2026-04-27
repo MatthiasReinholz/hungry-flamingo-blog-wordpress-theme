@@ -101,11 +101,4 @@
 	overlay.addEventListener('click', function (e) {
 		if (e.target && e.target.tagName === 'A') { close(); }
 	});
-
-	// Footer year (data-hfb-year).
-	var y = document.querySelectorAll('[data-hfb-year]');
-	if (y.length) {
-		var year = new Date().getFullYear();
-		Array.prototype.forEach.call(y, function (el) { el.textContent = year; });
-	}
 }());

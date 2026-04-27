@@ -1,7 +1,9 @@
 # Release Checklist
 
 - Confirm all files are tracked and there are no accidental local artifacts.
-- Run PHP syntax checks, PHPCS, JavaScript lint, CSS lint, and visual smoke tests.
+- Run `npm run validate`, then visual smoke tests.
+- Confirm `composer i18n:pot` produces no translation-template drift.
+- Confirm `bash scripts/run-theme-check.sh` passes against the packaged theme fixture.
 - Test on the minimum supported WordPress and PHP versions, plus the latest WordPress stable.
 - Test front page, blog home, single post, page, category, tag, author, date, search, and 404 templates.
 - With WooCommerce active, test shop archive, product category/tag archive, product search, single product, cart, checkout, order confirmation, account page, notices, product gallery, and add-to-cart flow.
@@ -10,7 +12,7 @@
 - Confirm `screenshot.png` matches the actual theme appearance and is no larger than 1200 x 900.
 - Confirm `style.css`, `readme.txt`, `README.md`, `CHANGELOG.md`, and `LICENSE` agree on version, requirements, and license.
 - Confirm third-party asset notices are complete.
-- Confirm `languages/hungry-flamingo-blog.pot` is regenerated after user-facing string changes.
+- Confirm `languages/hungry-flamingo-blog.pot` is regenerated after user-facing string changes and committed.
 - Build the release ZIP with `npm run dist` and verify it with `npm run verify:dist`.
 - Confirm the installable artifact is `dist/hungry-flamingo-blog.zip` or `dist/package/hungry-flamingo-blog`, not the repository root.
 - If continuous reading is part of the release story, test the Hungry Flamingo Blog Companion plugin separately.
@@ -18,6 +20,7 @@
 - Confirm keyboard access, skip link, search dialog focus handling, mobile menu focus handling, and visible focus states.
 - Confirm WooCommerce product cards, add-to-cart controls, notices, cart quantity controls, checkout fields, mobile cart submit container, and order confirmation blocks pass keyboard and accessibility smoke checks.
 - Release stable versions through the `Prepare release` and `Finalize release` GitHub Actions workflows so GitHub Release assets are produced from the verified package.
-- For beta releases, push a prerelease semver tag such as `v1.0.0-beta.1`; the `Publish tag release` workflow must finish green and attach the verified installable ZIP to the GitHub prerelease.
+- For beta releases, push an annotated prerelease semver tag such as `v1.0.0-beta.1`; the `Publish tag release` workflow must finish green and attach the verified installable ZIP to the GitHub prerelease.
+- Confirm GitHub releases include the installable ZIP, CycloneDX SBOM, Sigstore bundle, and build provenance attestation.
 - Confirm testers understand that prerelease tags use the matching stable WordPress metadata version inside the installable package.
 - Use `Release repair` only to intentionally rebuild and republish the artifact for an existing stable tag.

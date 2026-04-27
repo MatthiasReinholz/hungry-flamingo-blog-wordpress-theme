@@ -3,6 +3,11 @@ dist/
 node_modules/
 vendor/
 .phpcs-cache
+.phpunit.cache/
 .eslintcache
+coverage/
 playwright-report/
 test-results/
+*.log
+.env
+.env.*

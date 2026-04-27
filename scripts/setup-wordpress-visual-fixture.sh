@@ -12,6 +12,7 @@ SERVER_LOG="${HFB_WP_SERVER_LOG:-/tmp/wp-server.log}"
 WP_CLI_PHAR="${HFB_WP_CLI_PHAR:-/tmp/wp-cli.phar}"
 WP_CLI_VERSION="${HFB_WP_CLI_VERSION:-2.11.0}"
 WP_CLI_SHA512="${HFB_WP_CLI_SHA512:-adb12146bab8d829621efed41124dcd0012f9027f47e0228be7080296167566070e4a026a09c3989907840b21de94b7a35f3bfbd5f827c12f27c5803546d1bba}"
+WP_VERSION="${HFB_WP_VERSION:-6.9.4}"
 WOO_VERSION="${HFB_WOOCOMMERCE_VERSION:-10.7.0}"
 
 if [ ! -f "$THEME_SOURCE/style.css" ] || [ ! -f "$THEME_SOURCE/theme.json" ]; then
@@ -25,11 +26,27 @@ mkdir -p "$WP_PATH"
 curl -fsSL "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" -o "$WP_CLI_PHAR"
 echo "${WP_CLI_SHA512}  ${WP_CLI_PHAR}" | sha512sum -c -
 
-WP_CLI=(php "$WP_CLI_PHAR" --path="$WP_PATH")
+WP_CLI=(php -d memory_limit=512M -d error_reporting=8191 "$WP_CLI_PHAR" --path="$WP_PATH" --allow-root)
 
-"${WP_CLI[@]}" core download --force
+"${WP_CLI[@]}" core download --force --version="$WP_VERSION"
 "${WP_CLI[@]}" config create --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1 --skip-check
-"${WP_CLI[@]}" db create || true
+# The fixture uses disposable local credentials against the CI/local MySQL service.
+php -r '
+mysqli_report( MYSQLI_REPORT_OFF );
+$mysqli = @new mysqli( "127.0.0.1", "root", "root" );
+if ( $mysqli->connect_errno ) {
+	fwrite( STDERR, "Could not connect to MySQL fixture at 127.0.0.1: " . $mysqli->connect_error . PHP_EOL );
+	exit( 1 );
+}
+if ( ! $mysqli->query( "DROP DATABASE IF EXISTS wordpress" ) ) {
+	fwrite( STDERR, "Could not reset fixture database: " . $mysqli->error . PHP_EOL );
+	exit( 1 );
+}
+if ( ! $mysqli->query( "CREATE DATABASE wordpress CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" ) ) {
+	fwrite( STDERR, "Could not create fixture database: " . $mysqli->error . PHP_EOL );
+	exit( 1 );
+}
+'
 "${WP_CLI[@]}" core install --url="$WP_URL" --title="Hungry Flamingo Smoke" --admin_user=admin --admin_password=password --admin_email=admin@example.com
 "${WP_CLI[@]}" option update home "$WP_URL"
 "${WP_CLI[@]}" option update siteurl "$WP_URL"
@@ -52,14 +69,19 @@ ACCOUNT_ID=$("${WP_CLI[@]}" post create --post_type=page --post_status=publish -
 
 PRODUCT_ID=$("${WP_CLI[@]}" post create --post_type=product --post_status=publish --post_title="Smoke Product" --post_name=smoke-product --post_content='<!-- wp:paragraph --><p>A test product used by visual smoke checks.</p><!-- /wp:paragraph -->' --post_excerpt="Smoke product excerpt." --porcelain)
 "${WP_CLI[@]}" post meta update "$PRODUCT_ID" _regular_price 19.00
-"${WP_CLI[@]}" post meta update "$PRODUCT_ID" _price 19.00
+"${WP_CLI[@]}" post meta update "$PRODUCT_ID" _sale_price 15.00
+"${WP_CLI[@]}" post meta update "$PRODUCT_ID" _price 15.00
 "${WP_CLI[@]}" post meta update "$PRODUCT_ID" _stock_status instock
 "${WP_CLI[@]}" post meta update "$PRODUCT_ID" _manage_stock no
 "${WP_CLI[@]}" term get product_type simple --by=slug >/dev/null 2>&1 || "${WP_CLI[@]}" term create product_type simple --slug=simple
 "${WP_CLI[@]}" post term set "$PRODUCT_ID" product_type simple
+"${WP_CLI[@]}" term get product_cat smoke-category --by=slug >/dev/null 2>&1 || "${WP_CLI[@]}" term create product_cat "Smoke Category" --slug=smoke-category
+"${WP_CLI[@]}" post term add "$PRODUCT_ID" product_cat smoke-category
 
-php -S "$SERVER_HOST:$SERVER_PORT" -t "$WP_PATH" >"$SERVER_LOG" 2>&1 &
-echo "$!" > /tmp/hfb-wp-server.pid
+nohup php -d memory_limit=512M -S "$SERVER_HOST:$SERVER_PORT" -t "$WP_PATH" >"$SERVER_LOG" 2>&1 < /dev/null &
+server_pid="$!"
+echo "$server_pid" > /tmp/hfb-wp-server.pid
+disown "$server_pid" 2>/dev/null || true
 
 for _ in {1..30}; do
 	if curl -fsS "$WP_URL" >/dev/null; then

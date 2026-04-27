@@ -14,7 +14,7 @@
 .editor-styles-wrapper h4 {
 	font-family: 'Fraunces', Georgia, serif;
 	font-weight: 700;
-	letter-spacing: -0.02em;
+	letter-spacing: 0;
 }
 .editor-styles-wrapper h1 { font-weight: 900; }
 .editor-styles-wrapper .wp-block-quote,

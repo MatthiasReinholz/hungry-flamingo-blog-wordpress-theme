@@ -1,5 +1,16 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+
 /.github export-ignore
 /AGENTS.md export-ignore
+/CLAUDE.md export-ignore
+/.editorconfig export-ignore
 /.gitignore export-ignore
 /.gitattributes export-ignore
 /.distignore export-ignore
@@ -7,13 +18,17 @@
 /composer.json export-ignore
 /composer.lock export-ignore
 /CHANGELOG.md export-ignore
+/CONTRIBUTING.md export-ignore
+/SECURITY.md export-ignore
 /docs export-ignore
 /eslint.config.mjs export-ignore
 /node_modules export-ignore
 /package.json export-ignore
 /package-lock.json export-ignore
 /phpcs.xml.dist export-ignore
+/phpunit.xml.dist export-ignore
 /playwright.config.js export-ignore
 /scripts export-ignore
 /tests export-ignore
 /vendor export-ignore
+/vitest.config.mjs export-ignore

@@ -1,19 +1,37 @@
 # Changelog
 
-## 1.0.0 - Pending stable release
+All notable changes to Hungry Flamingo Blog are documented here.
 
-- Added tag-push release automation so beta tags create or repair GitHub prereleases with installable ZIP assets.
-- Hardened prerelease publication so stable tags stay owned by the release PR flow and prerelease tags must come from trusted history.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and release versions use semantic versioning.
+
+## [Unreleased]
+
+## [1.0.0] - 2026-04-27
+
+### Added
+
+- First stable-ready block theme package for editorial blogs and longform publishing.
+- Full template coverage for front page, blog home, single posts, pages, archives, search, and error views.
+- WooCommerce support declarations, block templates, conditional store styling, and presentation patterns.
+- Local font policy, style variations, editor workflow documentation, and translation template.
+- Search overlay, sidebar table of contents, sidebar author-card hydration, mobile menu, and color scheme persistence.
+- Release packaging rules, package verification, visual smoke coverage, and GitHub Actions release workflows.
+
+### Changed
+
+- Moved continuous-reading functionality to the Hungry Flamingo Blog Companion plugin so the theme remains presentation-only.
+- Replaced placeholder newsletter forms with RSS feed links.
+- Replaced placeholder navigation references with portable page-list, category, and archive blocks.
+- Removed runtime remote Google Fonts loading from the front end and editor.
+
+### Fixed
+
 - Excluded the current single post from the sidebar related-post query.
 - Fixed first beta release-readiness issues from the final pre-release audit.
-- Added release documentation, tooling, packaging exclusions, and CI scaffolding.
-- Removed remote Google Fonts loading from the front end and editor.
-- Replaced placeholder newsletter forms with RSS feed links.
-- Added working search overlay, sidebar table of contents, and sidebar author-card hydration.
-- Replaced placeholder navigation refs with portable page-list/category/archive blocks.
-- Moved continuous-reading functionality to the Hungry Flamingo Blog Companion plugin.
-- Added template coverage for front page, blog home, category, tag, author, and date archives.
-- Added WooCommerce support declarations, product gallery support, block templates, theme.json Woo block styles, conditional store styling, accessibility checks, and store smoke-test coverage.
-- Added WooCommerce presentation patterns, style variations, and first-party editor/font documentation.
-- Added release packaging rules for dist archives and Git source exports.
-- Added GitHub Actions release workflows that publish verified installable theme artifacts from the source repository.
+
+### Security
+
+- Hardened release publication so stable releases are owned by the release PR flow and prerelease tags must be annotated and come from trusted history.
+
+[Unreleased]: https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/releases/tag/1.0.0

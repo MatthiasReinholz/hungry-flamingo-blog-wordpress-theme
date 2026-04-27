@@ -3,20 +3,32 @@
 	"version": "1.0.0",
 	"private": true,
 	"description": "A colorful editorial block theme for longform WordPress blogs.",
+	"engines": {
+		"node": ">=22"
+	},
 	"scripts": {
 		"dist": "bash scripts/build-theme-zip.sh",
-		"lint:js": "eslint assets/js tests/visual",
+		"lint:js": "eslint assets/js tests/js tests/visual",
 		"lint:css": "stylelint \"assets/css/**/*.css\"",
+		"lint": "npm run lint:js && npm run lint:css",
+		"lint:fix": "eslint assets/js tests/js tests/visual --fix && stylelint \"assets/css/**/*.css\" --fix",
+		"i18n:check": "bash scripts/check-pot-drift.sh",
+		"test:unit": "vitest run",
 		"test:visual": "playwright test",
 		"verify:dist": "bash scripts/verify-release-package.sh",
-		"test": "npm run lint:js && npm run lint:css"
+		"validate": "composer test:php && npm run lint && npm run test:unit && npm run i18n:check && npm run dist && HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist",
+		"test": "npm run lint && npm run test:unit"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.11.2",
 		"@eslint/js": "^9.24.0",
 		"@playwright/test": "^1.52.0",
+		"esbuild": "^0.28.0",
 		"eslint": "^9.24.0",
+		"globals": "^17.5.0",
+		"happy-dom": "^20.9.0",
 		"stylelint": "^16.18.0",
-		"stylelint-config-standard": "^38.0.0"
+		"stylelint-config-standard": "^38.0.0",
+		"vitest": "^4.1.5"
 	}
 }
