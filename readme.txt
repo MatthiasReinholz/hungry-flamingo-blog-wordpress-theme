@@ -3,7 +3,7 @@ Contributors: matthiasreinholz
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Tags: blog, full-site-editing, one-column, two-columns, custom-colors, custom-logo, featured-images, threaded-comments, wide-blocks, block-styles, editor-style, news, e-commerce
@@ -48,6 +48,10 @@ The theme stores a first-party `hfb_theme` cookie for the visitor's light/dark p
 Public templates may render WordPress avatars for authors or commenters. The theme uses WordPress' configured avatar system; on default WordPress installs, visitors' browsers may request avatar images from Gravatar.
 
 == Changelog ==
+
+= 1.0.1 =
+
+- Updated release metadata and package artifacts.
 
 = 1.0.0 =
 

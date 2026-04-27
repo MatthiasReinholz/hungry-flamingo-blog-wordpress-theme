@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-3.0-only.
 msgid ""
 msgstr ""
-"Project-Id-Version: Hungry Flamingo Blog 1.0.0\n"
+"Project-Id-Version: Hungry Flamingo Blog 1.0.1\n"
 "Report-Msgid-Bugs-To: https://github.com/MatthiasReinholz/hungry-flamingo-blog-wordpress-theme/issues\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
