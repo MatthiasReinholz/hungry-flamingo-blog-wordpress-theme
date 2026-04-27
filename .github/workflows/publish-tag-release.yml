@@ -17,6 +17,19 @@ jobs:
     name: Publish GitHub release for version tag
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: wordpress
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     permissions:
       contents: write
       attestations: write
@@ -114,6 +127,23 @@ jobs:
           npm run dist
           HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 
+      - name: Install Playwright browser
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Set up WordPress fixture from packaged theme
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        env:
+          HFB_THEME_SOURCE: ${{ github.workspace }}/dist/package/hungry-flamingo-blog
+        run: bash scripts/setup-wordpress-visual-fixture.sh
+
+      - name: Run release visual smoke tests
+        if: ${{ steps.version.outputs.supported == 'true' }}
+        env:
+          HFB_VISUAL_STRICT_WOO: '1'
+          WP_BASE_URL: http://127.0.0.1:8888
+        run: npm run test:visual
+
       - name: Generate release notes
         if: ${{ steps.version.outputs.supported == 'true' }}
         env:
@@ -151,7 +181,7 @@ jobs:
           PRERELEASE: ${{ steps.version.outputs.prerelease }}
         run: |
           set -euo pipefail
-          edit_flags=(--title "$TAG_NAME" --notes-file dist/release-notes.md)
+          edit_flags=(--title "$TAG_NAME" --notes-file dist/release-notes.md --draft=false)
           create_flags=(--verify-tag --title "$TAG_NAME" --notes-file dist/release-notes.md)
           edit_flags+=(--prerelease --latest=false)
           create_flags+=(--prerelease --latest=false)

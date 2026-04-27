@@ -103,7 +103,7 @@ final class Theme {
 		add_theme_support( 'html5', [ 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' ] );
 		add_theme_support( 'post-formats', [ 'aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat' ] );
 
-		add_editor_style( 'assets/css/editor.css' );
+		add_editor_style( [ 'assets/css/theme.css', 'assets/css/woocommerce.css', 'assets/css/editor.css' ] );
 	}
 
 	private function register_modules(): void {

@@ -11,7 +11,7 @@ Hungry Flamingo Blog is a colorful block theme for editorial blogs and longform 
 
 - Block templates and template parts for home, front page, single, page, archive, search, 404, category, tag, author, and date views.
 - WooCommerce block templates for product archives, product search, single products, cart, checkout, and order confirmation.
-- Patterns: article card, home hero, and sidebar category widget.
+- Patterns: article card, home hero, sidebar category widget, and WooCommerce presentation layouts.
 - Client-side enhancements for search overlay, table of contents, sidebar author card, mobile menu, feed links, and color scheme persistence.
 - WooCommerce support declarations, product gallery support, theme.json block styles, and conditional store styles for WooCommerce catalog, product, cart, checkout, order-confirmation, and account surfaces.
 - WooCommerce presentation patterns for product collections, article-product callouts, comparison tables, cart trust bands, and post-purchase reading.
@@ -42,10 +42,11 @@ See [docs/editorial-workflow.md](docs/editorial-workflow.md) for template/patter
 
 ```sh
 composer install
-composer lint:php
+composer test:php
 npm install
-npm run lint:js
-npm run lint:css
+npm test
+npm run dist
+HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 ```
 
 Visual smoke tests expect a running WordPress site:
@@ -79,6 +80,8 @@ Prerelease tags package the matching stable WordPress metadata version. For exam
 ## Privacy
 
 The theme stores a first-party `hfb_theme` cookie for the light/dark preference. It contains only `light` or `dark`, lasts one year, uses `SameSite=Lax`, and is not used for tracking or shared with external services.
+
+Public templates may render WordPress avatars for authors or commenters. The theme uses WordPress' configured avatar system; on default WordPress installs, visitors' browsers may request avatar images from Gravatar.
 
 ## Release Checklist
 

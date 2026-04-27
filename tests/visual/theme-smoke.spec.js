@@ -12,9 +12,14 @@ async function runA11y(page, context = null) {
 	expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
 }
 
-async function skipUnlessPresent(page, selector, message) {
+const strictWooSmoke = globalThis.process?.env?.HFB_VISUAL_STRICT_WOO === '1';
+
+async function requireOrSkipPresent(page, selector, message, strict = false) {
 	const count = await page.locator(selector).count();
-	test.skip(count === 0, message);
+	if (count === 0 && !strict) {
+		test.skip(true, message);
+	}
+	expect(count, message).toBeGreaterThan(0);
 }
 
 async function expectWooStylesheet(page) {
@@ -66,7 +71,7 @@ test.describe('Hungry Flamingo Blog smoke checks', () => {
 
 	test('woocommerce catalog, product, cart, and checkout render', async ({ page }) => {
 		await page.goto('/?post_type=product');
-		await skipUnlessPresent(page, '.hfb-store-layout', 'WooCommerce product archive is not available.');
+		await requireOrSkipPresent(page, '.hfb-store-layout', 'WooCommerce product archive is not available.', strictWooSmoke);
 		await expect(page.locator('.hfb-store-layout').first()).toBeVisible();
 		await expectWooStylesheet(page);
 		const productHeading = page.getByRole('heading', { name: 'Smoke Product' }).first();
@@ -75,7 +80,7 @@ test.describe('Hungry Flamingo Blog smoke checks', () => {
 		await runA11y(page, '.hfb-store-layout');
 
 		await page.goto('/?s=Smoke&post_type=product');
-		await skipUnlessPresent(page, '.hfb-store-layout', 'WooCommerce product search is not available.');
+		await requireOrSkipPresent(page, '.hfb-store-layout', 'WooCommerce product search is not available.', strictWooSmoke);
 		await expect(page.locator('.hfb-store-layout').first()).toBeVisible();
 		await expect(page.getByRole('heading', { name: 'Smoke Product' }).first()).toBeVisible();
 		await expectWooStylesheet(page);

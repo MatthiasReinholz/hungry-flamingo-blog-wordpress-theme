@@ -18,7 +18,7 @@ The theme includes WooCommerce support declarations, product gallery support, bl
 
 == Installation ==
 
-1. Upload the theme directory to `wp-content/themes/`.
+1. Upload the installable release ZIP or extracted release directory to WordPress.
 2. Activate Hungry Flamingo Blog in Appearance > Themes.
 3. Add pages and posts, then customize the header, footer, and navigation in the Site Editor.
 4. Optional: configure a newsletter plugin or provider if you want email capture beyond the built-in RSS links.
@@ -44,6 +44,8 @@ No. The theme uses CSS font stacks and does not enqueue remote font assets at ru
 == Privacy ==
 
 The theme stores a first-party `hfb_theme` cookie for the visitor's light/dark preference. The value is limited to `light` or `dark`, expires after one year, uses `SameSite=Lax`, and is not used for tracking or sent to external services.
+
+Public templates may render WordPress avatars for authors or commenters. The theme uses WordPress' configured avatar system; on default WordPress installs, visitors' browsers may request avatar images from Gravatar.
 
 == Changelog ==
 

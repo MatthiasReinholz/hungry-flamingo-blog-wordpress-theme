@@ -207,6 +207,14 @@ h1 { font-variation-settings: 'opsz' 144; }
 	font-family: var(--font-display);
 	font-weight: 900; font-size: 22px; letter-spacing: -0.02em;
 }
+.brand .wp-block-site-logo { margin: 0; line-height: 0; }
+.brand .wp-block-site-logo img {
+	width: 36px;
+	height: 36px;
+	border-radius: 12px;
+	object-fit: cover;
+}
+.brand .wp-block-site-logo + .brand__link { display: none; }
 .brand .brand__link { display: inline-flex; }
 .brand-mark {
 	width: 36px; height: 36px;

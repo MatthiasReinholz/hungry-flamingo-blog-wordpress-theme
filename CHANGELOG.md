@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 - Unreleased
+## 1.0.0 - Pending stable release
 
 - Added tag-push release automation so beta tags create or repair GitHub prereleases with installable ZIP assets.
 - Hardened prerelease publication so stable tags stay owned by the release PR flow and prerelease tags must come from trusted history.

@@ -22,6 +22,19 @@ jobs:
       (startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.head.ref, 'hotfix/'))
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: wordpress
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     permissions:
       contents: write
       attestations: write
@@ -79,6 +92,20 @@ jobs:
         run: |
           npm run dist
           HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Set up WordPress fixture from packaged theme
+        env:
+          HFB_THEME_SOURCE: ${{ github.workspace }}/dist/package/hungry-flamingo-blog
+        run: bash scripts/setup-wordpress-visual-fixture.sh
+
+      - name: Run release visual smoke tests
+        env:
+          HFB_VISUAL_STRICT_WOO: '1'
+          WP_BASE_URL: http://127.0.0.1:8888
+        run: npm run test:visual
 
       - name: Generate release notes
         run: bash scripts/generate-release-notes.sh "${{ steps.release.outputs.version }}" > dist/release-notes.md
@@ -139,7 +166,7 @@ jobs:
           set -euo pipefail
           if gh release view "$VERSION" >/dev/null 2>&1; then
             gh release upload "$VERSION" dist/hungry-flamingo-blog.zip --clobber
-            gh release edit "$VERSION" --title "$VERSION" --notes-file dist/release-notes.md --prerelease=false --latest
+            gh release edit "$VERSION" --title "$VERSION" --notes-file dist/release-notes.md --draft=false --prerelease=false --latest
           else
             gh release create "$VERSION" dist/hungry-flamingo-blog.zip \
               --verify-tag \

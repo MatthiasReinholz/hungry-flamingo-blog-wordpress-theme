@@ -9,16 +9,18 @@
 
 	function updateGeneratedLinks() {
 		var homeUrl = cfg.homeUrl || '/';
+		var articlesUrl = cfg.articlesUrl || homeUrl;
+		var searchUrl = cfg.searchUrl || (homeUrl + (homeUrl.indexOf('?') === -1 ? '?s=' : '&s='));
 		var feedUrl = cfg.feedUrl || '/feed/';
 
 		document.querySelectorAll('[data-hfb-home-link]').forEach(function (link) {
-			link.href = homeUrl;
+			link.href = articlesUrl;
 		});
 		document.querySelectorAll('[data-hfb-feed-link]').forEach(function (link) {
 			link.href = feedUrl;
 		});
 		document.querySelectorAll('[data-hfb-search-link]').forEach(function (link) {
-			link.href = homeUrl + (homeUrl.indexOf('?') === -1 ? '?s=' : '&s=');
+			link.href = searchUrl;
 		});
 		document.querySelectorAll('[data-hfb-search-form]').forEach(function (form) {
 			form.action = homeUrl;

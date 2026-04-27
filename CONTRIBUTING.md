@@ -6,10 +6,9 @@ Run the checks before opening a pull request:
 
 ```sh
 composer install
-composer lint:php
+composer test:php
 npm install
-npm run lint:js
-npm run lint:css
+npm test
 npm run dist
 HFB_VERIFY_SKIP_BUILD=1 npm run verify:dist
 ```
