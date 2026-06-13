@@ -23,7 +23,7 @@
 		"@axe-core/playwright": "^4.11.2",
 		"@eslint/js": "^9.24.0",
 		"@playwright/test": "^1.52.0",
-		"esbuild": "^0.28.0",
+		"esbuild": "^0.28.1",
 		"eslint": "^9.24.0",
 		"globals": "^17.5.0",
 		"happy-dom": "^20.9.0",
