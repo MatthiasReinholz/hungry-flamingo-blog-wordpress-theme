@@ -63,7 +63,7 @@ export function classifyAudit(raw, status, verifiedInstances) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 	try {
 		const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-		const result = run('npm', ['audit', '--json', '--audit-level=info', '--registry=https://registry.npmjs.org'], root);
+		const result = run('npm', ['audit', '--json', '--audit-level=info', '--include=dev', '--include=optional', '--include=peer', '--registry=https://registry.npmjs.org'], root);
 		process.stdout.write(result.stdout);
 		process.stderr.write(result.stderr);
 		const instances = verifyRemediation(root);

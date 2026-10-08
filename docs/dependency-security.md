@@ -30,7 +30,8 @@ are required development tools. Using `--ignore-scripts` leaves pristine vulnera
 code installed; the subsequent audit rejects that state.
 
 `npm run audit:npm` retains the complete raw npm audit JSON and separately reports
-local remediation. Its npm-v2 adapter validates process status, schema, counts and
+local remediation. It explicitly includes development, optional and peer
+dependencies even when the caller has configured npm omit defaults. Its npm-v2 adapter validates process status, schema, counts and
 both directions of dependency edges. It qualifies ancestors only when every path
 terminates in the exact reviewed braces advisory and all installed braces copies
 pass integrity and behavioral verification. An unrelated high/critical advisory
@@ -53,3 +54,14 @@ the real JavaScript/CSS linters, including the security helper modules. The full
 accessibility and Theme Check qualification. Change required check names together
 with repository protection settings; a renamed job cannot satisfy an older
 required context.
+
+## Linter major qualification
+
+The follow-up paired migration uses ESLint 10 with its matching recommended
+configuration, and Stylelint 17 with standard configuration 40. The development
+Node requirement is `^22.13.0 || >=24`, matching the supported ESLint runtime
+contract while CI continues on Node 22. The newer CSS rules replace the deprecated
+`clip` property on screen-reader-only text with `clip-path: inset(50%)`; the text
+remains in the accessibility tree. Qualify the complete package and browser/axe
+suites together with these toolchain changes. The braces patch and actual depth
+regressions remain unchanged and are verified against the new lock.
