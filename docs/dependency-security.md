@@ -43,3 +43,13 @@ provenance. When an official compatible fix is available, replace the backport,
 remove its installer and qualification, restore ordinary npm auditing, and retain
 coverage that audit failures cannot become successful CI results. None of these
 development files are included in the WordPress theme release package.
+
+## Required CI check contract
+
+The protected main branch requires the exact GitHub Actions context `lint`. CI
+therefore provides a dedicated job that installs the pinned tooling and executes
+the real JavaScript/CSS linters, including the security helper modules. The full
+`Validate theme` job continues package, PHP, unit, WordPress/WooCommerce, visual,
+accessibility and Theme Check qualification. Change required check names together
+with repository protection settings; a renamed job cannot satisfy an older
+required context.
