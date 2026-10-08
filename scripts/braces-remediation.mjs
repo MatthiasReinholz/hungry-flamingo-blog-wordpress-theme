@@ -24,7 +24,8 @@ export function isMainModule(moduleURL, entry = process.argv[1]) {
 }
 
 export function run(command, args, cwd) {
-	const result = spawnSync(command, args, { cwd, encoding: 'utf8', timeout: 120000, maxBuffer: 32 * 1024 * 1024 });
+	const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^GIT_/i.test(key)));
+	const result = spawnSync(command, args, { cwd, env, encoding: 'utf8', timeout: 120000, maxBuffer: 32 * 1024 * 1024 });
 	assert(!result.error && !result.signal, `${command} did not complete`);
 	return result;
 }
@@ -114,6 +115,7 @@ export function verifyRemediation(root) {
 }
 
 export function applyRemediation(root) {
+	root = resolve(root);
 	const { metadata, instances } = provenance(root);
 	const pending = [];
 	// Inspect every instance before the first write; drift is never overwritten.
@@ -121,7 +123,8 @@ export function applyRemediation(root) {
 		const actual = fileHashes(path);
 		if (isDeepStrictEqual(actual, metadata.installedFiles)) continue;
 		assert.deepEqual(actual, metadata.pristineFiles, `Pristine braces bytes differ: ${path}`);
-		const args = ['apply', `--directory=${npmRelative(root, path)}`, metadata.patchPath];
+		// An explicit work tree prevents Git from silently skipping nested-project paths.
+		const args = [`--work-tree=${root}`, 'apply', `--directory=${npmRelative(root, path)}`, metadata.patchPath];
 		const check = run('git', [...args, '--check'], root);
 		assert.equal(check.status, 0, `Cannot apply reviewed patch: ${check.stderr}`);
 		pending.push(args);
