@@ -1,10 +1,12 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it } from 'vitest';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import process from 'node:process';
+import { delimiter, join, resolve, posix, win32 } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { classifyAudit } from '../../scripts/audit-npm.mjs';
-import { applyRemediation, verifyRemediation, run } from '../../scripts/braces-remediation.mjs';
+import { applyRemediation, verifyRemediation, run, within, npmRelative } from '../../scripts/braces-remediation.mjs';
 
 const raw = readFileSync(new URL('../fixtures/npm-braces-audit.json', import.meta.url), 'utf8');
 const instance = ['node_modules/braces'];
@@ -82,5 +84,43 @@ describe('maintained braces source patch', () => {
 		const root = fixture();
 		writeFileSync(join(root, 'node_modules/braces/extra.js'), 'extra');
 		expect(() => verifyRemediation(root)).toThrow();
+	});
+});
+
+describe('platform-aware remediation paths', () => {
+	it('rejects POSIX, Windows parent, drive and UNC escapes and normalizes npm keys', () => {
+		for (const [implementation, root, inside, outside] of [
+			[posix, '/project', '/project/node_modules/braces', ['/', '/outside', '/project-escape/file', '/project/../outside']],
+			[win32, 'C:/project', 'C:/project/node_modules/braces', ['C:/', 'C:/outside', 'C:/project-escape/file', 'C:/project/../outside', 'D:/project/file', '//server/share/file']],
+			[win32, 'C:/Project', 'c:/project/node_modules/braces', ['c:/outside']],
+			[win32, '//server/share/project', '//server/share/project/node_modules/braces', ['//server/share/outside', '//other/share/project/file', '//server/other/project/file']],
+		]) {
+			expect(within(root, inside, implementation)).toBe(true);
+			expect(npmRelative(root, inside, implementation)).toBe('node_modules/braces');
+			for (const path of outside) {
+				expect(within(root, path, implementation)).toBe(false);
+				expect(() => npmRelative(root, path, implementation)).toThrow(/escapes root/);
+			}
+		}
+		expect(within('C:\\project', 'C:\\project\\..\\outside', win32)).toBe(false);
+		expect(npmRelative('C:\\project', 'C:\\project\\node_modules\\braces\\lib\\parse.js', win32)).toBe('node_modules/braces/lib/parse.js');
+	});
+});
+
+describe('physical CLI identity', () => {
+	it('executes symlinked application and audit entrypoints', () => {
+		const root = mkdtempSync(join(tmpdir(), 'theme-remediation-entry-'));
+		fixtures.push(root);
+		const npm = join(root, 'npm');
+		writeFileSync(npm, '#!/usr/bin/env node\nprocess.stdout.write(' + JSON.stringify(raw) + '); process.exitCode = 1;\n');
+		chmodSync(npm, 0o700);
+		for (const script of ['braces-remediation.mjs', 'audit-npm.mjs']) {
+			const alias = join(root, script);
+			symlinkSync(resolve('scripts', script), alias);
+			const result = spawnSync(process.execPath, [alias], { cwd: process.cwd(), encoding: 'utf8', timeout: 120000,
+				env: { ...process.env, PATH: root + delimiter + process.env.PATH } });
+			expect(result.status, result.stderr).toBe(0);
+			expect(result.stdout).toMatch(script === 'audit-npm.mjs' ? /locallyRemediated/ : /Verified local braces remediation/);
+		}
 	});
 });

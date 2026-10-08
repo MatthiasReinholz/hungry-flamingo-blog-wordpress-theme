@@ -2,17 +2,26 @@ import assert from 'node:assert/strict';
 import { isDeepStrictEqual } from 'node:util';
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, readdirSync, realpathSync, existsSync } from 'node:fs';
-import { basename, join, relative, resolve, isAbsolute } from 'node:path';
+import nativePath, { basename, join, resolve, isAbsolute } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 export const advisory = 'GHSA-vfj7-8cjw-p6xm';
 const hash = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 const readJson = path => JSON.parse(readFileSync(path, 'utf8'));
-const within = (root, path) => {
-	const part = relative(root, path);
-	return part !== '..' && !part.startsWith('../') && !isAbsolute(part);
-};
+export function within(root, path, implementation = nativePath) {
+	const part = implementation.relative(root, path);
+	return part !== '..' && !part.startsWith(`..${implementation.sep}`) && !implementation.isAbsolute(part);
+}
+export function npmRelative(root, path, implementation = nativePath) {
+	assert(within(root, path, implementation), 'Relative npm path escapes root');
+	return implementation.relative(root, path).split(implementation.sep).join('/');
+}
+
+export function isMainModule(moduleURL, entry = process.argv[1]) {
+	return Boolean(entry) && existsSync(entry)
+		&& nativePath.relative(realpathSync(resolve(entry)), realpathSync(fileURLToPath(moduleURL))) === '';
+}
 
 export function run(command, args, cwd) {
 	const result = spawnSync(command, args, { cwd, encoding: 'utf8', timeout: 120000, maxBuffer: 32 * 1024 * 1024 });
@@ -29,7 +38,7 @@ function fileHashes(root) {
 			if (entry.isDirectory()) visit(path);
 			else {
 				assert(entry.isFile(), 'Unexpected braces file type');
-				result[relative(root, path)] = hash(path);
+				result[npmRelative(root, path)] = hash(path);
 			}
 		}
 	}
@@ -88,7 +97,7 @@ export function provenance(root) {
 	assert(!readJson(join(root, 'package.json')).workspaces, 'Workspace installs require separate qualification');
 	const instances = installedBraces(root);
 	for (const path of instances) {
-		const entry = lock.packages[relative(root, path)];
+		const entry = lock.packages[npmRelative(root, path)];
 		assert(entry && entry.version === '3.0.3' && entry.integrity === metadata.upstreamIntegrity && entry.resolved === metadata.upstreamTarball, 'Unreviewed braces lock entry');
 	}
 	return { metadata, instances };
@@ -101,7 +110,7 @@ export function verifyRemediation(root) {
 		const result = run(process.execPath, [join(root, metadata.regressionScript), path], root);
 		assert.equal(result.status, 0, `Braces regression failed: ${result.stderr}`);
 	}
-	return instances.map(path => relative(root, path));
+	return instances.map(path => npmRelative(root, path));
 }
 
 export function applyRemediation(root) {
@@ -112,7 +121,7 @@ export function applyRemediation(root) {
 		const actual = fileHashes(path);
 		if (isDeepStrictEqual(actual, metadata.installedFiles)) continue;
 		assert.deepEqual(actual, metadata.pristineFiles, `Pristine braces bytes differ: ${path}`);
-		const args = ['apply', `--directory=${relative(root, path)}`, metadata.patchPath];
+		const args = ['apply', `--directory=${npmRelative(root, path)}`, metadata.patchPath];
 		const check = run('git', [...args, '--check'], root);
 		assert.equal(check.status, 0, `Cannot apply reviewed patch: ${check.stderr}`);
 		pending.push(args);
@@ -124,7 +133,7 @@ export function applyRemediation(root) {
 	return verifyRemediation(root);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMainModule(import.meta.url)) {
 	try {
 		console.log('Verified local braces remediation:', applyRemediation(resolve(fileURLToPath(new URL('..', import.meta.url)))));
 	} catch (error) {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { advisory, run, verifyRemediation } from './braces-remediation.mjs';
+import { advisory, run, verifyRemediation, isMainModule } from './braces-remediation.mjs';
 
 const severities = ['info', 'low', 'moderate', 'high', 'critical'];
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -60,7 +60,7 @@ export function classifyAudit(raw, status, verifiedInstances) {
 	return { locallyRemediated, blocked };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMainModule(import.meta.url)) {
 	try {
 		const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 		const result = run('npm', ['audit', '--json', '--audit-level=info', '--include=dev', '--include=optional', '--include=peer', '--registry=https://registry.npmjs.org'], root);

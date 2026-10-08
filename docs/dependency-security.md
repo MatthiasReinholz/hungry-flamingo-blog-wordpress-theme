@@ -65,3 +65,9 @@ contract while CI continues on Node 22. The newer CSS rules replace the deprecat
 remains in the accessibility tree. Qualify the complete package and browser/axe
 suites together with these toolchain changes. The braces patch and actual depth
 regressions remain unchanged and are verified against the new lock.
+
+Path containment uses the host platform separator and rejects parent, drive and
+UNC escapes. Package inventory, npm lock and audit keys use canonical forward
+slashes; Windows lexical path regressions run alongside the actual package tests.
+Both CLI entrypoints compare physical module paths so invocation aliases cannot
+silently skip patching or auditing; imports remain nonexecuting.
