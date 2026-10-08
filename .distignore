@@ -23,6 +23,7 @@ vendor
 tests
 docs
 scripts
+patches
 composer.json
 composer.lock
 eslint.config.mjs
