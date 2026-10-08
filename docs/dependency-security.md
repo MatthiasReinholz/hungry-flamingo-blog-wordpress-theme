@@ -71,3 +71,9 @@ UNC escapes. Package inventory, npm lock and audit keys use canonical forward
 slashes; Windows lexical path regressions run alongside the actual package tests.
 Both CLI entrypoints compare physical module paths so invocation aliases cannot
 silently skip patching or auditing; imports remain nonexecuting.
+
+Patch preflight and application explicitly set Git's work tree to the verified
+project root and remove inherited Git environment variables. Nested projects in
+ordinary or linked Git worktrees therefore use the same verified target paths as
+standalone projects. Exact installed-byte verification remains required after
+application; a successful Git exit alone is insufficient.

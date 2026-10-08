@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import process from 'node:process';
-import { delimiter, join, resolve, posix, win32 } from 'node:path';
+import { delimiter, join, relative, resolve, posix, win32 } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { classifyAudit } from '../../scripts/audit-npm.mjs';
 import { applyRemediation, verifyRemediation, run, within, npmRelative } from '../../scripts/braces-remediation.mjs';
@@ -67,6 +67,43 @@ describe('maintained braces source patch', () => {
 		expect(() => verifyRemediation(root)).toThrow();
 		expect(applyRemediation(root)).toEqual(instance);
 		expect(applyRemediation(root)).toEqual(instance);
+	});
+	it('removes inherited Git environment keys irrespective of casing', () => {
+		const root = fixture();
+		cpSync(resolve('scripts/braces-remediation.mjs'), join(root, 'scripts/braces-remediation.mjs'));
+		const result = spawnSync(process.execPath, ['--input-type=module', '-e', `import { run } from './scripts/braces-remediation.mjs'; const result = run(process.execPath, ['-e', 'console.log(JSON.stringify(Object.keys(process.env).filter(key => /^git_/i.test(key))))'], process.cwd()); process.stdout.write(result.stdout); process.exit(result.status);`], {
+			cwd: root, encoding: 'utf8', timeout: 120000,
+			env: { ...process.env, Git_Dir: 'untrusted-directory', git_work_tree: 'untrusted-work-tree', GIT_INDEX_FILE: 'untrusted-index' }
+		});
+		expect(result.status, result.stderr).toBe(0);
+		expect(JSON.parse(result.stdout)).toEqual([]);
+	});
+	it('patches a real nested linked-worktree project despite inherited Git context', () => {
+		const baseline = fixture();
+		expect(run('git', ['apply', '--reverse', '--directory=node_modules/braces', 'patches/braces@3.0.3.patch'], baseline).status).toBe(0);
+		const repository = mkdtempSync(join(tmpdir(), 'theme-patch-repository-'));
+		fixtures.push(repository);
+		const worktree = join(repository, 'linked');
+		for (const args of [
+			['init'],
+			['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-m', 'Fixture'],
+			['worktree', 'add', '--detach', worktree]
+		]) expect(run('git', ['-c', 'commit.gpgsign=false', '-c', `core.hooksPath=${join(repository, 'no-hooks')}`, ...args], repository).status).toBe(0);
+		const root = join(worktree, 'nested-theme');
+		cpSync(baseline, root, { recursive: true });
+		cpSync(resolve('scripts/braces-remediation.mjs'), join(root, 'scripts/braces-remediation.mjs'));
+		expect(() => verifyRemediation(root)).toThrow();
+		const result = spawnSync(process.execPath, [join(root, 'scripts/braces-remediation.mjs')], {
+			cwd: root, encoding: 'utf8', timeout: 120000,
+			env: { ...process.env, GIT_DIR: join(repository, 'missing-git-dir'), GIT_WORK_TREE: repository }
+		});
+		expect(result.status, result.stderr + result.stdout).toBe(0);
+		expect(result.stdout).toContain('Verified local braces remediation');
+		expect(verifyRemediation(root)).toEqual(instance);
+		expect(applyRemediation(root)).toEqual(instance);
+		expect(run('git', [`--work-tree=${root}`, 'apply', '--reverse', '--directory=node_modules/braces', 'patches/braces@3.0.3.patch'], root).status).toBe(0);
+		expect(() => verifyRemediation(root)).toThrow();
+		expect(applyRemediation(relative(process.cwd(), root))).toEqual(instance);
 	});
 	it('rejects modified installed code before writing anything', () => {
 		const root = fixture();
