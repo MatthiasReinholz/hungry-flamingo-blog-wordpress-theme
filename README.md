@@ -51,6 +51,9 @@ npm install
 npm run validate
 ```
 
+See [development dependency security](docs/dependency-security.md) for the maintained
+local braces backport, installation requirements and audit qualification.
+
 Visual smoke tests expect a running WordPress site:
 
 ```sh

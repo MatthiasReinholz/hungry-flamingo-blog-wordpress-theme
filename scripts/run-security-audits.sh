@@ -11,11 +11,12 @@ run_with_retries() {
 	local delay="${HFB_AUDIT_RETRY_DELAY:-15}"
 
 	while true; do
+		local status
 		if "$@"; then
 			return 0
+		else
+			status="$?"
 		fi
-
-		local status="$?"
 		if [ "$attempt" -ge "$max_attempts" ]; then
 			echo "${label} failed after ${attempt} attempt(s)." >&2
 			return "$status"
@@ -28,4 +29,4 @@ run_with_retries() {
 }
 
 run_with_retries "Composer audit" composer audit
-run_with_retries "npm audit" npm audit --audit-level=high
+run_with_retries "npm audit" npm run audit:npm

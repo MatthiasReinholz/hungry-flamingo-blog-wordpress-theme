@@ -43,6 +43,10 @@ export default [
 		}
 	},
 	{
+		files: ['scripts/*.mjs', 'scripts/*.cjs'],
+		languageOptions: { globals: globals.node }
+	},
+	{
 		files: ['tests/js/**/*.js'],
 		languageOptions: {
 			ecmaVersion: 2022,
