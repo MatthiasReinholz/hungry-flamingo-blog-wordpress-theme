@@ -59,8 +59,8 @@ required context.
 
 The follow-up paired migration uses ESLint 10 with its matching recommended
 configuration, and Stylelint 17 with standard configuration 40. The development
-Node requirement is `^22.13.0 || >=24`, matching the supported ESLint runtime
-contract while CI continues on Node 22. The newer CSS rules replace the deprecated
+Node requirement is `>=24`, within the supported ESLint runtime contract; CI and
+the release workflows run on Node 24. The newer CSS rules replace the deprecated
 `clip` property on screen-reader-only text with `clip-path: inset(50%)`; the text
 remains in the accessibility tree. Qualify the complete package and browser/axe
 suites together with these toolchain changes. The braces patch and actual depth
