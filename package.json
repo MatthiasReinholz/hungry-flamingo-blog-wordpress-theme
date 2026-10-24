@@ -4,7 +4,7 @@
 	"private": true,
 	"description": "A colorful editorial block theme for longform WordPress blogs.",
 	"engines": {
-		"node": "^22.13.0 || >=24"
+		"node": ">=24"
 	},
 	"scripts": {
 		"dist": "bash scripts/build-theme-zip.sh",
