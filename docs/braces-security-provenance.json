@@ -7,7 +7,7 @@
   "upstreamPrHead": "d0d575e55e74a4e0218e5248fafb79efc3e54ebb",
   "patchPath": "patches/braces@3.0.3.patch",
   "patchSha256": "b2b27ebab2d2032f01f17f19b7bd85633f0aa1b6c15f35ee1ba32f66ac0f6b48",
-  "lockfileSha256": "4003e465ad7311f25a9ec2ef1eacf0dba5d69fa6f4ff34266ef265a85f719cc0",
+  "lockfileSha256": "f131bbcafc7f1aca0ff886b084d179eb951a9445edd2f64a47258910496d9207",
   "regressionScript": "scripts/test-braces-depth.cjs",
   "regressionSha256": "5e0859ecd38cfcdeb0daca2305f57ff0296cf6d3c47d3c50574da35812543f4c",
   "installedFiles": {
